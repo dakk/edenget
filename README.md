@@ -4,7 +4,7 @@ EdenGet is a multiplatform batch downloader for mangaeden.com
 It runs well on Linux, Windows, Osx and all OS where you can run python2 and gtk+.
 
 
-## Software used:
+## Software used
 - Python2
 - Gtk+
 
