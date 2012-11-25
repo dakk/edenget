@@ -45,14 +45,50 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 class MainWindow:
+	folderUri = None
+	chapterInfo = None
+	mangaInfo = None
+	
 	def __init__(self):
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		self.window.connect("destroy", self.destroy)
 		self.window.set_title("EdenGet")
 		self.window.set_default_size(400, 500)
 		
+		mainBox = gtk.VBox()
+		self.window.add(mainBox)
+
+
+		# Button toolbar
+		toolbar = gtk.Toolbar()
+
+		iconw = gtk.Image()
+		iconw.set_from_stock(gtk.STOCK_FLOPPY, 16)
+		add_button = toolbar.append_item("Download", "", "Private", iconw, self.onDownload)
+		
+		iconw = gtk.Image()
+		iconw.set_from_stock(gtk.STOCK_FLOPPY, 16)
+		add_button = toolbar.append_item("Download All", "", "Private", iconw, self.onDownloadAll)
+		
+		iconw = gtk.Image()
+		iconw.set_from_stock(gtk.STOCK_DIRECTORY, 16)
+		add_button = toolbar.append_item("Destination Folder", "", "Private", iconw, self.onChooseDestination)
+  
+   		#iconw = gtk.Image()
+		#iconw.set_from_stock(gtk.STOCK_ABOUT, 16)
+		#about_button = toolbar.append_item("About", "About this app", "Private", iconw, self.aboutEvent)
+		
+		#iconw = gtk.Image()
+		#iconw.set_from_stock(gtk.STOCK_QUIT, 16)
+		#close_button = toolbar.append_item("Quit", "Closes this app", "Private", iconw, self.destroy)
+
+		mainBox.pack_start(toolbar, False, False, 0)
+		
+		
+		# Box
 		hbox = gtk.HBox()
-		self.window.add(hbox)
+		mainBox.add(hbox)
+		
 		
 		# VBox for mangalist
 		vbox = gtk.VBox()
@@ -68,7 +104,7 @@ class MainWindow:
 		self.mangaListView.connect('cursor-changed', self.onSelectedManga)
 
 		rendererText = gtk.CellRendererText()
-		column = gtk.TreeViewColumn("", rendererText, text=1)
+		column = gtk.TreeViewColumn("Nome", rendererText, text=1)
 		column.set_sort_column_id(1)
 		self.mangaListView.append_column(column)
   
@@ -100,20 +136,56 @@ class MainWindow:
 		self.chapterListView.append_column(column)
 		
 		rendererText = gtk.CellRendererText()
-		column = gtk.TreeViewColumn("", rendererText, text=1)
+		column = gtk.TreeViewColumn("Titolo", rendererText, text=1)
 		column.set_sort_column_id(1)
 		self.chapterListView.append_column(column)
   
 		sw.add(self.chapterListView)
-		
+			
 		self.window.show_all()
 
 
+	def onDownload(self, window):
+		if self.chapterInfo == None:
+			pass
+			
+		if self.folderUri == None:
+			self.onChooseDestination(window)
+			
+			
+	def onDownloadAll(self, window):
+		if self.mangaInfo == None:
+			pass
+			
+		if self.folderUri == None:
+			self.onChooseDestination(window)		
+		
+			
+	def onChooseDestination(self, window):
+		d = gtk.FileChooserDialog(	title = "Select a directory to save downloaded data", 
+									action = gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+									buttons = (("Select", 1)))
+		if d.run() == 1:
+			try:
+				self.folderUri = d.get_uri().replace("file://", "")
+				d.destroy()
+			except:
+				d.destroy()
+				self.onChooseDestination(window)
+			
+	def onSelectedChapter(self, widget, data = None):
+		selection = self.chapterListView.get_selection()
+		selection.set_mode(gtk.SELECTION_SINGLE)
+		tree_model, tree_iter = selection.get_selected()
+		self.chapterInfo = [tree_model.get_value(tree_iter, 1), tree_model.get_value(tree_iter, 0)]
+		
+		
 	def onSelectedManga(self, widget, data = None):
 		selection = self.mangaListView.get_selection()
 		selection.set_mode(gtk.SELECTION_SINGLE)
 		tree_model, tree_iter = selection.get_selected()
 		manga = [tree_model.get_value(tree_iter, 1), tree_model.get_value(tree_iter, 0)]
+		self.chapterInfo = None
 		
 		self.chapterList.clear()
 		
@@ -129,16 +201,21 @@ class MainWindow:
 			loader.close()        			
 			
 			pixbuf = loader.get_pixbuf()
-			
-			pixbuf = pixbuf.scale_simple(150,150*pixbuf.get_height()/pixbuf.get_width(),gtk.gdk.INTERP_BILINEAR)
-  
+						
+			if pixbuf.get_height() < pixbuf.get_width():
+				pixbuf = pixbuf.scale_simple(200,200*pixbuf.get_height()/pixbuf.get_width(),gtk.gdk.INTERP_BILINEAR)  
+			else:
+				pixbuf = pixbuf.scale_simple(200*pixbuf.get_width()/pixbuf.get_height(),200,gtk.gdk.INTERP_BILINEAR)  
+				
 			self.mangaImage.set_from_pixbuf(pixbuf)
+			
 		else:
 			self.mangaImage.clear()
 			
 		
 	def destroy(self, widget, data = None):			
 		gtk.main_quit()
+		
 		
 	def run(self):
 		gtk.main()
