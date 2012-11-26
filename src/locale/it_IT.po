@@ -1,0 +1,57 @@
+# Language locale/it translations for PACKAGE package.
+# Copyright (C) 2012 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#  <ggessadavide@gmail.com>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-11-26 12:18+0100\n"
+"PO-Revision-Date: 2012-11-26 12:19+0100\n"
+"Last-Translator:  <ggessadavide@gmail.com>\n"
+"Language-Team: Language locale/it\n"
+"Language: locale/it_IT\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ASCII\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: MainWindow.py:71
+msgid "Download"
+msgstr ""
+
+#: MainWindow.py:75
+msgid "Download All"
+msgstr ""
+
+#: MainWindow.py:79
+msgid "Destination Folder"
+msgstr ""
+
+#: MainWindow.py:115
+msgid "Search"
+msgstr ""
+
+#: MainWindow.py:131 MainWindow.py:150 MainWindow.py:169
+msgid "Name"
+msgstr ""
+
+#: MainWindow.py:143
+msgid "Bookmarks"
+msgstr ""
+
+#: MainWindow.py:162
+msgid "Full List"
+msgstr ""
+
+#: MainWindow.py:199
+msgid "Title"
+msgstr ""
+
+#: MainWindow.py:252
+msgid "Select a directory to save downloaded data"
+msgstr ""
+
+#: MainWindow.py:254
+msgid "Select"
+msgstr ""
