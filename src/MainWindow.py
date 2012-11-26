@@ -23,8 +23,10 @@ import locale
 import os
 import sys
 import gettext
+import threading as th
 
 import MirrorList
+import QueueWindow
 
 gtk.gdk.threads_init()
 
@@ -56,6 +58,7 @@ class MainWindow:
 	mangaInfo = None
 	mangas = None
 	lang = 1
+	queueWindow = QueueWindow.QueueWindow()
 	
 	def __init__(self):
 		# Locale init
@@ -89,6 +92,24 @@ class MainWindow:
 		mainBox = gtk.VBox()
 		self.window.add(mainBox)
 
+
+		# Menu
+		menubar = gtk.MenuBar()
+		mainBox.pack_start(menubar, False, False, 0)
+		
+		
+		# Help menu
+		menu_item = gtk.MenuItem("Help")
+		menubar.append(menu_item)
+		
+		menu = gtk.Menu()
+		
+		it = gtk.MenuItem("About")
+		it.connect('activate', self.onAbout)
+		menu.append(it)
+		
+		menu_item.set_submenu(menu)
+		
 
 		# Button toolbar
 		toolbar = gtk.Toolbar()
@@ -232,8 +253,21 @@ class MainWindow:
 		self.window.show_all()
 		
 		self.onLanguageComboChanged(self.window)
+		
 
 
+	def onAbout(self, window):
+		d = gtk.AboutDialog()
+		d.set_authors(["Davide Gessa (gessadavide@gmail.com)"])
+		d.set_license(license)
+		d.set_comments("A multiplatform batch downloader for mangaeden.com")
+		d.set_wrap_license(True)
+		
+		d.set_logo(window.render_icon(gtk.STOCK_ABOUT, gtk.ICON_SIZE_DIALOG))
+		d.set_name(APP_NAME)
+		d.run()
+		d.destroy()
+		
 
 	def onLanguageComboChanged(self, window):
 		self.lang = self.languageCombo.get_active()
