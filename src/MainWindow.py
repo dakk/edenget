@@ -26,6 +26,7 @@ import gettext
 import threading as th
 
 import MirrorList
+from MangaEden import MangaEden
 import QueueWindow
 
 gtk.gdk.threads_init()
@@ -52,37 +53,40 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
+
+# Locale init
+local_path = os.path.realpath(os.path.dirname(sys.argv[0]))
+
+langs = []
+	
+lc, encoding = locale.getdefaultlocale()
+if (lc):
+	langs = [lc]
+
+language = os.environ.get('LANGUAGE', None)
+if (language):
+	langs += language.split(":")
+langs += ["it_IT", "en_US"]
+
+gettext.bindtextdomain(APP_NAME, local_path)
+gettext.textdomain(APP_NAME)
+		
+lang = gettext.translation(APP_NAME, local_path, languages=langs, fallback = True)
+		
+_ = lang.gettext
+		
+
 class MainWindow:
 	folderUri = None
-	chapterInfo = None
+	selectedChapters = None
 	mangaInfo = None
+	selectedManga = None
 	mangas = None
 	lang = 1
+	mangaEden = None
 	queueWindow = QueueWindow.QueueWindow()
 	
-	def __init__(self):
-		# Locale init
-		self.local_path = os.path.realpath(os.path.dirname(sys.argv[0]))
-
-		langs = []
-		
-		lc, encoding = locale.getdefaultlocale()
-		if (lc):
-			langs = [lc]
-
-		language = os.environ.get('LANGUAGE', None)
-		if (language):
-			langs += language.split(":")
-		langs += ["it_IT", "en_US"]
-
-		gettext.bindtextdomain(APP_NAME, self.local_path)
-		gettext.textdomain(APP_NAME)
-		
-		self.lang = gettext.translation(APP_NAME, self.local_path, languages=langs, fallback = True)
-		
-		_ = self.lang.gettext
-		
-		
+	def __init__(self):	
 		# Gtk stuffs
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		self.window.connect("destroy", self.destroy)
@@ -97,43 +101,53 @@ class MainWindow:
 		menubar = gtk.MenuBar()
 		mainBox.pack_start(menubar, False, False, 0)
 		
-		
-		# Help menu
-		menu_item = gtk.MenuItem("Help")
+		# File menu
+		menu_item = gtk.MenuItem(_("File"))
 		menubar.append(menu_item)
-		
 		menu = gtk.Menu()
+		menu_item.set_submenu(menu)
 		
-		it = gtk.MenuItem("About")
+		it = gtk.ImageMenuItem(gtk.STOCK_QUIT)
+		it.connect('activate', self.destroy)
+		menu.append(it)
+		
+
+
+		# Edit menu
+		menu_item = gtk.MenuItem(_("Edit"))
+		menubar.append(menu_item)		
+		menu = gtk.Menu()
+		menu_item.set_submenu(menu)
+		
+		it = gtk.MenuItem(_("Destination folder"))
+		#it = gtk.ImageMenuItem(gtk.STOCK_HARDDISK)
+		it.connect('activate', self.onChooseDestination)
+		menu.append(it)
+		
+				
+		# Help menu
+		menu_item = gtk.MenuItem(_("Help"))
+		menubar.append(menu_item)
+		menu = gtk.Menu()
+		menu_item.set_submenu(menu)
+		
+		it = gtk.ImageMenuItem(gtk.STOCK_ABOUT)
 		it.connect('activate', self.onAbout)
 		menu.append(it)
 		
-		menu_item.set_submenu(menu)
 		
 
 		# Button toolbar
 		toolbar = gtk.Toolbar()
+		
+		iconw = gtk.Image()
+		iconw.set_from_stock(gtk.STOCK_EXECUTE, 16)
+		toolbar.append_item(_("Download Queue"), "", "Private", iconw, lambda w: self.queueWindow.changeVisibility())  
 
-		iconw = gtk.Image()
-		iconw.set_from_stock(gtk.STOCK_FLOPPY, 16)
-		toolbar.append_item(_("Download"), "", "Private", iconw, self.onDownload)
-		
-		iconw = gtk.Image()
-		iconw.set_from_stock(gtk.STOCK_FLOPPY, 16)
-		toolbar.append_item(_("Download All"), "", "Private", iconw, self.onDownloadAll)
-		
 		iconw = gtk.Image()
 		iconw.set_from_stock(gtk.STOCK_DIRECTORY, 16)
 		toolbar.append_item(_("Destination Folder"), "", "Private", iconw, self.onChooseDestination)
-  
-   		#iconw = gtk.Image()
-		#iconw.set_from_stock(gtk.STOCK_ABOUT, 16)
-		#about_button = toolbar.append_item("About", "About this app", "Private", iconw, self.aboutEvent)
 		
-		#iconw = gtk.Image()
-		#iconw.set_from_stock(gtk.STOCK_QUIT, 16)
-		#close_button = toolbar.append_item("Quit", "Closes this app", "Private", iconw, self.destroy)
-
 		self.languageCombo = gtk.combo_box_new_text()
 		self.languageCombo.insert_text(1, "Italiano")
 		self.languageCombo.insert_text(0, "English")
@@ -142,7 +156,7 @@ class MainWindow:
 		toolbar.append_element(gtk.TOOLBAR_CHILD_WIDGET, self.languageCombo, None, None, None, None, None, None)
 		
 		mainBox.pack_start(toolbar, False, False, 0)
-		
+
 		
 		# Box
 		hbox = gtk.HBox()
@@ -236,7 +250,8 @@ class MainWindow:
 		
 		self.chapterList = gtk.ListStore(int, str, str)
 		self.chapterListView = gtk.TreeView(self.chapterList)
-
+		self.chapterListView.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+		self.chapterListView.connect('cursor-changed', self.onSelectedChapter)
 
 		rendererText = gtk.CellRendererText()
 		column = gtk.TreeViewColumn("", rendererText, text=0)
@@ -249,9 +264,25 @@ class MainWindow:
 		self.chapterListView.append_column(column)
   
 		sw.add(self.chapterListView)
+	
+	
+		toolbar = gtk.Toolbar()
+
+		iconw = gtk.Image()
+		iconw.set_from_stock(gtk.STOCK_FLOPPY, 16)
+		toolbar.append_item(_("Download"), "", "Private", iconw, self.onDownload)
+		
+		iconw = gtk.Image()
+		iconw.set_from_stock(gtk.STOCK_FLOPPY, 16)
+		toolbar.append_item(_("Download All"), "", "Private", iconw, self.onDownloadAll)
+		
+  
+		vbox.pack_start(toolbar, False, False, 0)
 			
 		self.window.show_all()
 		
+		
+		self.mangaEden = MangaEden("user", "password")
 		self.onLanguageComboChanged(self.window)
 		
 
@@ -263,7 +294,7 @@ class MainWindow:
 		d.set_comments("A multiplatform batch downloader for mangaeden.com")
 		d.set_wrap_license(True)
 		
-		d.set_logo(window.render_icon(gtk.STOCK_ABOUT, gtk.ICON_SIZE_DIALOG))
+		d.set_logo(window.render_icon(gtk.STOCK_DIALOG_INFO, gtk.ICON_SIZE_DIALOG))
 		d.set_name(APP_NAME)
 		d.run()
 		d.destroy()
@@ -275,12 +306,17 @@ class MainWindow:
 		self.searchList.clear()
 		self.mangaList.clear()
 		self.marksList.clear()
+		self.chapterList.clear()
 		self.onSearchTextModified(window)
 		
-		self.mangas = MirrorList.get()[0].getMangaList(self.lang)
-		for x in self.mangas:	
-			self.mangaList.append([x[0], x[1]])	
-		
+		try:
+			self.mangas = self.mangaEden.getMangaList(self.lang)
+			for x in self.mangas:	
+				self.mangaList.append([x[0], x[1]])	
+		except:
+			self.mangas = []
+			self.mangaList.clear()
+			self.networkError()
 
 	def onSearchTextModified(self, window):
 		if self.mangas == None:
@@ -293,12 +329,16 @@ class MainWindow:
 			if x[1].lower().find(query.lower()) != -1:
 				self.searchList.append([x[0], x[1]])	
 
+
 	def onDownload(self, window):
-		if self.chapterInfo == None:
+		if self.selectedChapters == None:
 			pass
 			
 		if self.folderUri == None:
 			self.onChooseDestination(window)
+			
+		for x in self.selectedChapters:
+			self.mangaEden.getMangaChapter(self.selectedManga[1], x, self.folderUri)
 			
 			
 	def onDownloadAll(self, window):
@@ -321,11 +361,19 @@ class MainWindow:
 				d.destroy()
 				self.onChooseDestination(window)
 			
+			
 	def onSelectedChapter(self, widget, data = None):
 		selection = self.chapterListView.get_selection()
-		selection.set_mode(gtk.SELECTION_SINGLE)
-		tree_model, tree_iter = selection.get_selected()
-		self.chapterInfo = [tree_model.get_value(tree_iter, 1), tree_model.get_value(tree_iter, 0)]
+		selection.set_mode(gtk.SELECTION_MULTIPLE)
+		
+		self.selectedChapters = []
+		
+		def foreach(model, path, iter, selected):
+			selected.append(model.get_value(iter, 0))
+			
+		selection.selected_foreach(foreach, self.selectedChapters)
+    
+		#[tree_model.get_value(tree_iter, 1), tree_model.get_value(tree_iter, 0)]
 		
 		
 	def onSelectedManga(self, widget, data = None):
@@ -335,34 +383,50 @@ class MainWindow:
 		selection = data.get_selection()
 		selection.set_mode(gtk.SELECTION_SINGLE)
 		tree_model, tree_iter = selection.get_selected()
-		manga = [tree_model.get_value(tree_iter, 1), tree_model.get_value(tree_iter, 0)]
-		self.chapterInfo = None
+		self.selectedManga = [tree_model.get_value(tree_iter, 1), tree_model.get_value(tree_iter, 0)]
+		self.selectedChapters = None
 		
 		self.chapterList.clear()
 		
-		for x in MirrorList.get()[0].getMangaChaptersList(manga[1]):	
-			self.chapterList.append([int(x[1]), x[2], x[0]])	
-			
-		self.mangaInfo = MirrorList.get()[0].getMangaInfo(manga[1])
-			
-		if self.mangaInfo[2] != None:
-			response = ul.urlopen(self.mangaInfo[2])
-			loader = gtk.gdk.PixbufLoader()
-			loader.write(response.read())
-			loader.close()        			
-			
-			pixbuf = loader.get_pixbuf()
-						
-			if pixbuf.get_height() < pixbuf.get_width():
-				pixbuf = pixbuf.scale_simple(200,200*pixbuf.get_height()/pixbuf.get_width(),gtk.gdk.INTERP_BILINEAR)  
-			else:
-				pixbuf = pixbuf.scale_simple(200*pixbuf.get_width()/pixbuf.get_height(),200,gtk.gdk.INTERP_BILINEAR)  
+		try:
+			for x in self.mangaEden.getMangaChaptersList(self.selectedManga[1]):	
+				self.chapterList.append([int(x[1]), x[2], x[0]])	
+		
+			self.mangaInfo = self.mangaEden.getMangaInfo(self.selectedManga[1])
+		except:
+			self.mangaInfo = ""
+			self.networkError()
+			return
 				
-			self.mangaImage.set_from_pixbuf(pixbuf)
+		if self.mangaInfo[2] != None:
+			try:
+				response = ul.urlopen(self.mangaInfo[2])
+				loader = gtk.gdk.PixbufLoader()
+				loader.write(response.read())
+				loader.close()        			
 			
+				pixbuf = loader.get_pixbuf()
+						
+				if pixbuf.get_height() < pixbuf.get_width():
+					pixbuf = pixbuf.scale_simple(200,200*pixbuf.get_height()/pixbuf.get_width(),gtk.gdk.INTERP_BILINEAR)  
+				else:
+					pixbuf = pixbuf.scale_simple(200*pixbuf.get_width()/pixbuf.get_height(),200,gtk.gdk.INTERP_BILINEAR)  
+					
+				self.mangaImage.set_from_pixbuf(pixbuf)
+			
+			except:
+				self.mangaImage.clear()
+				return
 		else:
 			self.mangaImage.clear()
 			
+	
+	def networkError(self):
+		md = gtk.MessageDialog(self.window, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, _("Cannot connect to the server."))
+		md.set_title(_("Network Error"))
+		md.run()
+		md.destroy()
+		
 		
 	def destroy(self, widget, data = None):			
 		gtk.main_quit()

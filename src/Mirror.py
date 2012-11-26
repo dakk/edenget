@@ -18,6 +18,10 @@
 
 """ Abstract class that represent a mirror where I can get mangas """
 class Mirror:
+	def __init__(self, user=None, password=None):
+		self.user = user
+		self.password = password
+		
 	""" Return the name of the mirror """
 	def getName(self):
 		raise BaseException("Abstract method not implementated")

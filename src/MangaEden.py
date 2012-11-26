@@ -26,6 +26,8 @@ class MangaEden (Mirror):
 	LANGUAGES = [["0", "English", "en"], ["1", "Italiano", "it"]] 
 	IMG_BASE_PATH = "http://cdn.mangaeden.com/mangasimg/"
 	
+	def __init__(self, user, password):
+		Mirror.__init__(self, user, password)
 	
 	""" Return the name of the mirror """
 	def getName(self):
@@ -81,8 +83,12 @@ class MangaEden (Mirror):
 	def getMangaChapter(self, mangaCode, chapterNumber, destination, formatType="pdf"):
 		la = self.getMangaInfo(mangaCode)
 		
-		data = ul.urlopen("http://www.mangaeden.com/"+la[0]+"-"+formatType+"/"+la[1]+"/"+chapterNumber+"/").read()
+		url = "http://www.mangaeden.com/"+la[0]+"-"+formatType+"/"+la[1]+"/"+str(chapterNumber)+"/"
 		
-		f = open(destination+os.sep+la[1]+"_"+chapterNumber+".pdf", "w")
+		# Post login data to current page (username, password)
+
+		data = ul.urlopen(url).read()
+		
+		f = open(destination+os.sep+la[1]+"_"+str(chapterNumber)+".pdf", "w")
 		f.write(data)
 		f.close()
