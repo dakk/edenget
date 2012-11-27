@@ -26,7 +26,9 @@ import sys
 import gettext
 from SecondaryWindow import *
 
-class QueueWindow (SecondaryWindow):
-	def __init__(self):
-		SecondaryWindow.__init__(self, "Edenget - Download Queue")
+class PreferencesWindow (SecondaryWindow):
+	def __init__(self, mainWindow):
+		SecondaryWindow.__init__(self, "Edenget - Preferences")
 		self.window.set_default_size(400, 500)
+		
+		# username, password, destination window

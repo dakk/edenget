@@ -18,15 +18,18 @@
 import pygtk
 pygtk.require('2.0')
 import gtk
-import urllib2 as ul
-import threading as th
-import locale
-import os
-import sys
-import gettext
-from SecondaryWindow import *
 
-class QueueWindow (SecondaryWindow):
-	def __init__(self):
-		SecondaryWindow.__init__(self, "Edenget - Download Queue")
-		self.window.set_default_size(400, 500)
+class SecondaryWindow:
+	def __init__(self, title):
+		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+		self.window.connect("destroy", self.changeVisibility)
+		self.window.set_title(title)
+				
+		self.window.hide_all()
+				
+			
+	def changeVisibility(self):
+		if not self.window.get_visible():
+			self.window.show_all()
+		else:
+			self.window.hide_all()

@@ -28,6 +28,7 @@ import threading as th
 import MirrorList
 from MangaEden import MangaEden
 import QueueWindow
+import PreferencesWindow
 
 gtk.gdk.threads_init()
 
@@ -84,9 +85,13 @@ class MainWindow:
 	mangas = None
 	lang = 1
 	mangaEden = None
-	queueWindow = QueueWindow.QueueWindow()
+	queueWindow = None
+	preferencesWindow = None
 	
 	def __init__(self):	
+		self.queueWindow = QueueWindow.QueueWindow()
+		self.preferencesWindow = PreferencesWindow.PreferencesWindow(self)
+		
 		# Gtk stuffs
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		self.window.connect("destroy", self.destroy)
@@ -122,6 +127,10 @@ class MainWindow:
 		it = gtk.MenuItem(_("Destination folder"))
 		#it = gtk.ImageMenuItem(gtk.STOCK_HARDDISK)
 		it.connect('activate', self.onChooseDestination)
+		menu.append(it)
+
+		it = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
+		it.connect('activate', lambda w: self.preferencesWindow.changeVisibility())
 		menu.append(it)
 		
 				
