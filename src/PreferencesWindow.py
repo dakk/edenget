@@ -27,7 +27,7 @@ import gettext
 from SecondaryWindow import *
 
 class PreferencesWindow (SecondaryWindow):
-	first = True
+	#first = True
 	
 	def __init__(self, mainWindow):
 		self.mainWindow = mainWindow
@@ -127,11 +127,11 @@ class PreferencesWindow (SecondaryWindow):
 		PreferencesWindow.changeVisibility(self)
 
 	def changeVisibility(self):
-		if self.first:
-			self.loadPrefs()
-			self.first = False
-		else:
-			self.savePrefs()
+		#if self.first:
+		#	self.loadPrefs()
+		#	self.first = False
+		#else:
+		self.savePrefs()
 			
 		self.mainWindow.onChangeLoginData(self.username.get_text(), self.password.get_text())
 		

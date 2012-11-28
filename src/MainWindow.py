@@ -91,6 +91,7 @@ class MainWindow:
 	def __init__(self):	
 		self.queueWindow = QueueWindow.QueueWindow()
 		self.preferencesWindow = PreferencesWindow.PreferencesWindow(self)
+		self.preferencesWindow.loadPrefs()
 		
 		# Gtk stuffs
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)

@@ -15,9 +15,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-import urllib2 as ul
+import urllib as ul
 import json as js
 import os
+import httplib as hl
 
 from Mirror import Mirror
 
@@ -86,9 +87,24 @@ class MangaEden (Mirror):
 		url = "http://www.mangaeden.com/"+la[0]+"-"+formatType+"/"+la[1]+"/"+str(chapterNumber)+"/"
 		
 		# Post login data to current page (username, password)
-
-		data = ul.urlopen(url).read()
+		url1 = "mangaeden.com:80"
+		url2 = url.split(".com")[1].split("/")[1]
 		
+		headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
+		data = ul.urlencode({'username': self.user, 'password': self.password, 'remember': '1'})
+
+		h = hl.HTTPConnection(url1)
+
+
+		headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
+		h.request('POST', url2, data, headers)
+
+		r = h.getresponse()
+
+		data = r.read()
+
+		#data = ul.urlopen(url, data).read()
+		#print url
 		f = open(destination+os.sep+la[1]+"_"+str(chapterNumber)+".pdf", "w")
 		f.write(data)
 		f.close()
