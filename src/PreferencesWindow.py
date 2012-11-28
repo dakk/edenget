@@ -33,14 +33,17 @@ class PreferencesWindow (SecondaryWindow):
 		self.mainWindow = mainWindow
 		
 		SecondaryWindow.__init__(self, "Edenget - Preferences")
-		self.window.set_default_size(500, 200)
+		self.window.set_default_size(500, 150)
 
+		mainBox2 = gtk.VBox()
 		mainBox = gtk.VBox()
-		self.window.add(mainBox)
+		self.window.add(mainBox2)
+		mainBox2.pack_start(mainBox, False, False, 2)
+		
 		
 		# Login frame
 		frame = gtk.Frame("Login")
-		mainBox.pack_start(frame, False, False, 2)
+		mainBox.pack_start(frame, False, False, 5)
 		
 		boxm = gtk.VBox()
 		frame.add(boxm)
@@ -50,24 +53,24 @@ class PreferencesWindow (SecondaryWindow):
 
 		# Username
 		box = gtk.HBox()
-		boxm.pack_start(box, True, True, 0)
+		boxm.pack_start(box, True, True, 3)
 		
-		box.pack_start(gtk.Label("Username: "), False, False, 0)
-		box.pack_start(self.username, False, False, 0)
+		box.pack_start(gtk.Label("Username: "), False, False, 2)
+		box.pack_start(self.username, False, False, 2)
 
 		# Password
 		box = gtk.HBox()
-		boxm.pack_start(box, True, True, 0)
+		boxm.pack_start(box, True, True, 3)
 		
-		box.pack_start(gtk.Label("Password: "), False, False, 0)
-		box.pack_start(self.password, False, False, 0)
+		box.pack_start(gtk.Label("Password: "), False, False, 2)
+		box.pack_start(self.password, False, False, 2)
 
 
 		
 				
 		# Destination frame
 		frame = gtk.Frame("Filesystem")
-		mainBox.pack_start(frame, False, False, 2)
+		mainBox.pack_start(frame, False, False, 5)
 		
 		box = gtk.HBox()
 		frame.add(box)
@@ -84,7 +87,7 @@ class PreferencesWindow (SecondaryWindow):
 		# Button
 		bu = gtk.Button("Close")
 		bu.connect("clicked", self.onClose, None)
-		mainBox.pack_start(bu, False, False, 0);
+		mainBox.pack_start(bu, False, False, 5);
 
 
 	def loadPrefs(self):
