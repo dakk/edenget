@@ -291,7 +291,7 @@ class MainWindow:
 		self.window.show_all()
 		
 		
-		self.mangaEden = MangaEden("user", "password")
+		self.mangaEden = MangaEden("", "")
 		self.onLanguageComboChanged(self.window)
 		
 
@@ -440,6 +440,9 @@ class MainWindow:
 	def destroy(self, widget, data = None):			
 		gtk.main_quit()
 		
+	
+	def onChangeLoginData(self, username, password):
+		self.mangaEden = MangaEden(username, password)
 		
 	def run(self):
 		gtk.main()

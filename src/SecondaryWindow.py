@@ -22,12 +22,15 @@ import gtk
 class SecondaryWindow:
 	def __init__(self, title):
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-		self.window.connect("destroy", self.changeVisibility)
+		self.window.connect("delete_event", self.onDestroy)
+		self.window.connect("destroy", lambda w: None)
 		self.window.set_title(title)
 				
 		self.window.hide_all()
-				
-			
+	
+	def onDestroy(self, w, data = None):
+		self.changeVisibility()
+					
 	def changeVisibility(self):
 		if not self.window.get_visible():
 			self.window.show_all()

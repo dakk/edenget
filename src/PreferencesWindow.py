@@ -27,8 +27,112 @@ import gettext
 from SecondaryWindow import *
 
 class PreferencesWindow (SecondaryWindow):
+	first = True
+	
 	def __init__(self, mainWindow):
-		SecondaryWindow.__init__(self, "Edenget - Preferences")
-		self.window.set_default_size(400, 500)
+		self.mainWindow = mainWindow
 		
-		# username, password, destination window
+		SecondaryWindow.__init__(self, "Edenget - Preferences")
+		self.window.set_default_size(500, 200)
+
+		mainBox = gtk.VBox()
+		self.window.add(mainBox)
+		
+		# Login frame
+		frame = gtk.Frame("Login")
+		mainBox.pack_start(frame, False, False, 2)
+		
+		boxm = gtk.VBox()
+		frame.add(boxm)
+		
+		self.username = gtk.Entry()
+		self.password = gtk.Entry()
+
+		# Username
+		box = gtk.HBox()
+		boxm.pack_start(box, True, True, 0)
+		
+		box.pack_start(gtk.Label("Username: "), False, False, 0)
+		box.pack_start(self.username, False, False, 0)
+
+		# Password
+		box = gtk.HBox()
+		boxm.pack_start(box, True, True, 0)
+		
+		box.pack_start(gtk.Label("Password: "), False, False, 0)
+		box.pack_start(self.password, False, False, 0)
+
+
+		
+				
+		# Destination frame
+		frame = gtk.Frame("Filesystem")
+		mainBox.pack_start(frame, False, False, 2)
+		
+		box = gtk.HBox()
+		frame.add(box)
+		
+		self.destination = gtk.Entry()
+		if self.mainWindow.folderUri != None:
+			self.destination.set_text(self.mainWindow.folderUri)
+		box.add(self.destination)
+		
+		bu = gtk.Button("Select")
+		bu.connect('clicked', self.onChooseDestination, None)
+		box.add(bu)
+		
+		# Button
+		bu = gtk.Button("Close")
+		bu.connect("clicked", self.onClose, None)
+		mainBox.pack_start(bu, False, False, 0);
+
+
+	def loadPrefs(self):
+		try:
+			f = open("eden.cfg", "r")
+		except:
+			return
+		data = f.read().split("\n")
+		f.close()
+		
+		if len(data) >= 3:
+			self.username.set_text(data[0])
+			self.password.set_text(data[1])
+			self.mainWindow.folderUri = data[2]
+			self.destination.set_text(self.mainWindow.folderUri)
+			self.mainWindow.onChangeLoginData(self.username.get_text(), self.password.get_text())
+
+		
+	def savePrefs(self):
+		f = open("eden.cfg", "w")
+		
+		f.write(self.username.get_text()+"\n")
+		f.write(self.password.get_text()+"\n")
+		if self.mainWindow.folderUri != None:
+			f.write(self.mainWindow.folderUri+"\n")
+		else:
+			f.write(".\n")
+		f.close()
+		
+		
+	def onChooseDestination(self, window, data=None):
+		self.mainWindow.onChooseDestination(window)
+		self.destination.set_text(self.mainWindow.folderUri)
+
+
+	def onClose(self, w, data):
+		PreferencesWindow.changeVisibility(self)
+
+	def changeVisibility(self):
+		if self.first:
+			self.loadPrefs()
+			self.first = False
+		else:
+			self.savePrefs()
+			
+		self.mainWindow.onChangeLoginData(self.username.get_text(), self.password.get_text())
+		
+		SecondaryWindow.changeVisibility(self)
+		
+		if self.mainWindow.folderUri != None:
+			self.destination.set_text(self.mainWindow.folderUri)
