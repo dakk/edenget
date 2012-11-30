@@ -29,11 +29,11 @@ import MirrorList
 from MangaEden import MangaEden
 import QueueWindow
 import PreferencesWindow
+from Locale import Locale
 
 gtk.gdk.threads_init()
 
 
-APP_NAME = "edenget"
 
 license = """
 EdenGet
@@ -54,41 +54,20 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-
-# Locale init
-local_path = os.path.realpath(os.path.dirname(sys.argv[0]))
-
-langs = []
-	
-lc, encoding = locale.getdefaultlocale()
-if (lc):
-	langs = [lc]
-
-language = os.environ.get('LANGUAGE', None)
-if (language):
-	langs += language.split(":")
-langs += ["it_IT", "en_US"]
-
-gettext.bindtextdomain(APP_NAME, local_path)
-gettext.textdomain(APP_NAME)
-		
-lang = gettext.translation(APP_NAME, local_path, languages=langs, fallback = True)
-		
-_ = lang.gettext
 		
 
 class MainWindow:
-	folderUri = None
 	selectedChapters = None
 	mangaInfo = None
 	selectedManga = None
 	mangas = None
-	lang = 1
 	mangaEden = None
 	queueWindow = None
 	preferencesWindow = None
+	lang = 1
 	
 	def __init__(self):	
+		_ = Locale()._
 		self.queueWindow = QueueWindow.QueueWindow()
 		self.preferencesWindow = PreferencesWindow.PreferencesWindow(self)
 		self.preferencesWindow.loadPrefs()
@@ -127,7 +106,7 @@ class MainWindow:
 		
 		it = gtk.MenuItem(_("Destination folder"))
 		#it = gtk.ImageMenuItem(gtk.STOCK_HARDDISK)
-		it.connect('activate', self.onChooseDestination)
+		it.connect('activate', lambda w: self.preferencesWindow.onChooseDestination(w))
 		menu.append(it)
 
 		it = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
@@ -156,7 +135,7 @@ class MainWindow:
 
 		iconw = gtk.Image()
 		iconw.set_from_stock(gtk.STOCK_DIRECTORY, 16)
-		toolbar.append_item(_("Destination Folder"), "", "Private", iconw, self.onChooseDestination)
+		toolbar.append_item(_("Destination Folder"), "", "Private", iconw, self.preferencesWindow.onChooseDestination)
 		
 		self.languageCombo = gtk.combo_box_new_text()
 		self.languageCombo.insert_text(1, "Italiano")
@@ -298,10 +277,11 @@ class MainWindow:
 
 
 	def onAbout(self, window):
+		_ = Locale()._
 		d = gtk.AboutDialog()
 		d.set_authors(["Davide Gessa (gessadavide@gmail.com)"])
 		d.set_license(license)
-		d.set_comments("A multiplatform batch downloader for mangaeden.com")
+		d.set_comments(_("A multiplatform batch downloader for mangaeden.com"))
 		d.set_wrap_license(True)
 		
 		d.set_logo(window.render_icon(gtk.STOCK_DIALOG_INFO, gtk.ICON_SIZE_DIALOG))
@@ -344,32 +324,20 @@ class MainWindow:
 		if self.selectedChapters == None:
 			pass
 			
-		if self.folderUri == None:
-			self.onChooseDestination(window)
+		if self.preferencesWindow.folderUri == None:
+			self.preferencesWindow.onChooseDestination(window)
 			
 		for x in self.selectedChapters:
-			self.mangaEden.getMangaChapter(self.selectedManga[1], x, self.folderUri)
+			self.mangaEden.getMangaChapter(self.selectedManga[1], x, self.preferencesWindow.folderUri)
 			
 			
 	def onDownloadAll(self, window):
 		if self.mangaInfo == None:
 			pass
 			
-		if self.folderUri == None:
-			self.onChooseDestination(window)		
+		if self.preferencesWindow.folderUri == None:
+			self.preferencesWindow.onChooseDestination(window)		
 		
-			
-	def onChooseDestination(self, window):
-		d = gtk.FileChooserDialog(	title = _("Select a directory to save downloaded data"), 
-									action = gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
-									buttons = ((_("Select"), 1)))
-		if d.run() == 1:
-			try:
-				self.folderUri = d.get_uri().replace("file://", "")
-				d.destroy()
-			except:
-				d.destroy()
-				self.onChooseDestination(window)
 			
 			
 	def onSelectedChapter(self, widget, data = None):
@@ -432,6 +400,7 @@ class MainWindow:
 			
 	
 	def networkError(self):
+		_ = Locale()._
 		md = gtk.MessageDialog(self.window, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, _("Cannot connect to the server."))
 		md.set_title(_("Network Error"))
 		md.run()

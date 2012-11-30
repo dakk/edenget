@@ -25,14 +25,17 @@ import os
 import sys
 import gettext
 from SecondaryWindow import *
+from Locale import Locale
+
 
 class PreferencesWindow (SecondaryWindow):
-	#first = True
+	folderUri = None
 	
 	def __init__(self, mainWindow):
+		_ = Locale._
 		self.mainWindow = mainWindow
 		
-		SecondaryWindow.__init__(self, "Edenget - Preferences")
+		SecondaryWindow.__init__(self, _("Edenget - Preferences"))
 		self.window.set_default_size(500, 150)
 
 		mainBox2 = gtk.VBox()
@@ -42,50 +45,52 @@ class PreferencesWindow (SecondaryWindow):
 		
 		
 		# Login frame
-		frame = gtk.Frame("Login")
+		frame = gtk.Frame(_("Login"))
 		mainBox.pack_start(frame, False, False, 5)
 		
 		boxm = gtk.VBox()
 		frame.add(boxm)
 		
-		self.username = gtk.Entry()
-		self.password = gtk.Entry()
+		self.usernameEntry = gtk.Entry()
+		self.passwordEntry = gtk.Entry()
+		self.passwordEntry.set_visibility(False)
 
 		# Username
 		box = gtk.HBox()
 		boxm.pack_start(box, True, True, 3)
 		
-		box.pack_start(gtk.Label("Username: "), False, False, 2)
-		box.pack_start(self.username, False, False, 2)
+		box.pack_start(gtk.Label(_("Username: ")), False, False, 2)
+		box.pack_start(self.usernameEntry, False, False, 2)
 
 		# Password
 		box = gtk.HBox()
 		boxm.pack_start(box, True, True, 3)
 		
-		box.pack_start(gtk.Label("Password: "), False, False, 2)
-		box.pack_start(self.password, False, False, 2)
+		box.pack_start(gtk.Label(_("Password: ")), False, False, 2)
+		box.pack_start(self.passwordEntry, False, False, 2)
 
 
 		
 				
 		# Destination frame
-		frame = gtk.Frame("Filesystem")
+		frame = gtk.Frame(_("Filesystem"))
 		mainBox.pack_start(frame, False, False, 5)
 		
 		box = gtk.HBox()
 		frame.add(box)
 		
 		self.destination = gtk.Entry()
-		if self.mainWindow.folderUri != None:
-			self.destination.set_text(self.mainWindow.folderUri)
+		if self.folderUri != None:
+			self.destination.set_text(self.folderUri)
 		box.add(self.destination)
 		
-		bu = gtk.Button("Select")
+		bu = gtk.Button(_("Select"))
 		bu.connect('clicked', self.onChooseDestination, None)
 		box.add(bu)
 		
+		
 		# Button
-		bu = gtk.Button("Close")
+		bu = gtk.Button(_("Close"))
 		bu.connect("clicked", self.onClose, None)
 		mainBox.pack_start(bu, False, False, 5);
 
@@ -99,43 +104,50 @@ class PreferencesWindow (SecondaryWindow):
 		f.close()
 		
 		if len(data) >= 3:
-			self.username.set_text(data[0])
-			self.password.set_text(data[1])
-			self.mainWindow.folderUri = data[2]
-			self.destination.set_text(self.mainWindow.folderUri)
-			self.mainWindow.onChangeLoginData(self.username.get_text(), self.password.get_text())
+			self.usernameEntry.set_text(data[0])
+			self.passwordEntry.set_text(data[1])
+			self.folderUri = data[2]
+			self.destination.set_text(self.folderUri)
+			self.mainWindow.onChangeLoginData(self.usernameEntry.get_text(), self.passwordEntry.get_text())
 
 		
 	def savePrefs(self):
 		f = open("eden.cfg", "w")
 		
-		f.write(self.username.get_text()+"\n")
-		f.write(self.password.get_text()+"\n")
-		if self.mainWindow.folderUri != None:
-			f.write(self.mainWindow.folderUri+"\n")
+		f.write(self.usernameEntry.get_text()+"\n")
+		f.write(self.passwordEntry.get_text()+"\n")
+		if self.folderUri != None:
+			f.write(self.folderUri+"\n")
 		else:
 			f.write(".\n")
 		f.close()
 		
 		
 	def onChooseDestination(self, window, data=None):
-		self.mainWindow.onChooseDestination(window)
-		self.destination.set_text(self.mainWindow.folderUri)
+		_ = Locale._
+		d = gtk.FileChooserDialog(	title = _("Select a directory to save downloaded data"), 
+									action = gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+									buttons = ((_("Select"), 1)))
+		if d.run() == 1:
+			try:
+				self.folderUri = d.get_uri().replace("file://", "")
+				d.destroy()
+			except:
+				d.destroy()
+				self.onChooseDestination(window)
+				
+		self.destination.set_text(self.folderUri)
 
 
 	def onClose(self, w, data):
 		PreferencesWindow.changeVisibility(self)
 
 	def changeVisibility(self):
-		#if self.first:
-		#	self.loadPrefs()
-		#	self.first = False
-		#else:
 		self.savePrefs()
 			
-		self.mainWindow.onChangeLoginData(self.username.get_text(), self.password.get_text())
+		self.mainWindow.onChangeLoginData(self.usernameEntry.get_text(), self.passwordEntry.get_text())
 		
 		SecondaryWindow.changeVisibility(self)
 		
-		if self.mainWindow.folderUri != None:
-			self.destination.set_text(self.mainWindow.folderUri)
+		if self.folderUri != None:
+			self.destination.set_text(self.folderUri)

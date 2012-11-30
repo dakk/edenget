@@ -87,18 +87,34 @@ class MangaEden (Mirror):
 		
 	""" Download a single chapter and save it in the given destination """
 	def getMangaChapter(self, mangaCode, chapterNumber, destination, formatType="pdf"):
+		self.user = "edenget"
+		self.password = "pwedenget"
+		
 		la = self.getMangaInfo(mangaCode)
 		
 		url = "http://www.mangaeden.com/"+la[0]+"-"+formatType+"/"+la[1]+"/"+str(chapterNumber)+"/"
-		
+		fileUri = destination+os.sep+la[1]+"_"+str(chapterNumber)+".pdf"
 
 		# Login and get coockie
 		login_data = ul.urlencode({ 'username' : self.user, 'password' : self.password })
 
-		# Get the page
+		cj = cookielib.CookieJar()
+		opener = ul2.build_opener(ul2.HTTPCookieProcessor(cj))
+		data = opener.open("http://www.mangaeden.com/login/", login_data).read()	
+
+		if data.find("Invalid username and password combination") != -1:
+			return None
+			
+		# Get the chapter
+		opener = ul2.build_opener(ul2.HTTPCookieProcessor(cj))
+		req = opener.open(url)
+
+		f = open(fileUri, "w")
 		
+		while data != "":
+			data = req.read(1024)
+			f.write(data)
 		
-		#print url
-		f = open(destination+os.sep+la[1]+"_"+str(chapterNumber)+".pdf", "w")
-		f.write(data)
 		f.close()
+		
+		return fileUri
