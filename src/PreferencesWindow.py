@@ -37,6 +37,7 @@ class PreferencesWindow (SecondaryWindow):
 		
 		SecondaryWindow.__init__(self, _("Edenget - Preferences"))
 		self.window.set_default_size(500, 150)
+		self.window.set_modal(True)
 
 		mainBox2 = gtk.VBox()
 		mainBox = gtk.VBox()

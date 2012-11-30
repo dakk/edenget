@@ -328,7 +328,8 @@ class MainWindow:
 			self.preferencesWindow.onChooseDestination(window)
 			
 		for x in self.selectedChapters:
-			self.mangaEden.getMangaChapter(self.selectedManga[1], x, self.preferencesWindow.folderUri)
+			#self.mangaEden.getMangaChapter(self.selectedManga[1], x, self.preferencesWindow.folderUri)
+			self.queueWindow.add(self.mangaEden, self.selectedManga[1], x, self.preferencesWindow.folderUri)
 			
 			
 	def onDownloadAll(self, window):
@@ -337,6 +338,9 @@ class MainWindow:
 			
 		if self.preferencesWindow.folderUri == None:
 			self.preferencesWindow.onChooseDestination(window)		
+			
+		for x in self.mangaEden.getMangaChaptersList(self.selectedManga[1]):	
+			self.queueWindow.add(self.mangaEden, self.selectedManga[1], x[0], self.preferencesWindow.folderUri)
 		
 			
 			

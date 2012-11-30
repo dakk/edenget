@@ -84,6 +84,10 @@ class MangaEden (Mirror):
 
 
 
+	def getMangaChapterFileName(self, mangaCode, chapterNumber, destination, formatType="pdf"):
+		la = self.getMangaInfo(mangaCode)
+		return destination+os.sep+la[1]+"_"+str(chapterNumber)+".pdf"
+
 		
 	""" Download a single chapter and save it in the given destination """
 	def getMangaChapter(self, mangaCode, chapterNumber, destination, formatType="pdf"):
