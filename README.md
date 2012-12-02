@@ -9,11 +9,6 @@ This software can be extended with other manga mirrors.
 Only mangaeden.com is included at the moment.
 
 
-## Todo
-- Fix selected chapter download
-- The program doesnt' download the last selected chapter
-
-
 ## Software used
 - Python2
 - Gtk+
