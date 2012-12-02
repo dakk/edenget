@@ -19,6 +19,7 @@ import urllib as ul
 import urllib2 as ul2
 import json as js
 import os
+import time
 import httplib as hl
 import cookielib
 from Mirror import Mirror
@@ -30,7 +31,7 @@ class MangaEden (Mirror):
 	
 	def __init__(self, user, password):
 		Mirror.__init__(self, user, password)
-		self.formatTypes = {0:"pdf", 1:"png"}
+		self.formatTypes = {0:"pdf", 1:"image"}
 	
 	""" Return the name of the mirror """
 	def getName(self):
@@ -89,14 +90,15 @@ class MangaEden (Mirror):
 		la = self.getMangaInfo(mangaCode)
 		
 		if formatType == "pdf":
-			return destination+os.sep+la[1]+"_"+str(chapterNumber)+".pdf"
-		elif formatType == "png":
+			return destination+os.sep+la[1]+os.sep+la[1]+"_"+str(chapterNumber)+".pdf"
+		elif formatType == "image":
 			return destination+os.sep+la[1]+os.sep+str(chapterNumber)+os.sep
 		
 		return None
 		
+		
 	""" Download a single chapter and save it in the given destination """
-	def getMangaChapter(self, mangaCode, chapterNumber, destination, formatType="pdf"):
+	def getMangaChapter(self, mangaCode, chapterNumber, destination, formatType="pdf", progressNotify = None):
 		self.downloadLock.acquire()
 		
 		self.user = "edenget"
@@ -107,7 +109,10 @@ class MangaEden (Mirror):
 		fileUri = self.getMangaChapterFileName(mangaCode, chapterNumber, destination, formatType)
 		
 		if formatType == "pdf":
-			os.makedirs(fileUri.split(os.sep)[:-1])
+			try:
+				os.makedirs(destination+os.sep+la[1])
+			except:
+				pass
 			
 			url = "http://www.mangaeden.com/"+la[0]+"-"+formatType+"/"+la[1]+"/"+str(chapterNumber)+"/"
 
@@ -117,63 +122,104 @@ class MangaEden (Mirror):
 			cj = cookielib.CookieJar()
 			opener = ul2.build_opener(ul2.HTTPCookieProcessor(cj))
 			data = opener.open("http://www.mangaeden.com/login/", login_data).read()	
+			
+			
 
 			if data.find("Invalid username and password combination") != -1:
+				self.downloadLock.release()
 				return None
 				
+				
 			# Get the chapter
-			opener = ul2.build_opener(ul2.HTTPCookieProcessor(cj))
-			req = opener.open(url)
+			tr = 0
+			while tr < 3:
+				try:
+					opener = ul2.build_opener(ul2.HTTPCookieProcessor(cj))
+					req = opener.open(url)
+					
+					size = req.headers.items()[0][1]
+					downloaded = 0
 
-			f = open(fileUri, "w")
+
+					f = open(fileUri, "w")
+					
+					while data != "":
+						data = req.read(1024)
+						f.write(data)
+						downloaded += 1024
+						
+						if progressNotify:
+							progressNotify(int(100*downloaded/size))
+					
+					f.close()
+					tr = 5
+				except:
+					tr += 1
+					time.sleep(1)
 			
-			while data != "":
-				data = req.read(1024)
-				f.write(data)
-			
-			f.close()
-			
-			
-		elif formatType == "png":
-			os.makedirs(fileUri)
+		elif formatType == "image":
+			try:
+				os.makedirs(fileUri)
+			except:
+				pass
 			
 			# Get the chapter code
 			data = ul.urlopen("http://www.mangaeden.com/api/manga/"+str(mangaCode)+"/").read()
 				
 			jd = js.loads(data)['chapters']
 			chapterCode = None
-			
+						
 			for chap in jd:
 				if chap[0] == chapterNumber:
-					chpaterCode = chap[3]
+					chapterCode = chap[3]
 					break
 			
+			
 			if chapterCode == None:
+				self.downloadLock.release()
 				return None		
 			
+			
 			# Get the list of pages
-			data = ul.urlopen("http://www.mangaeden.com/api/chapter/"+str(chpaterCode)+"/").read()
+			data = ul.urlopen("http://www.mangaeden.com/api/chapter/"+str(chapterCode)+"/").read()
 				
 			l = []
 			jd = js.loads(data)['images']
 			urlList = []
 			
+			
 			for page in jd:
-				urlList.append([jd[0], jd[1]])
+				urlList.append([page[0], page[1]])
 				
-			print urlList
 			
 			
 			# Download each page
+			size = len(urlList)
+			downloaded = 0
+			
 			for page in urlList:
-				req = ul2.urlopen(page[1])
-				f = open(fileUri+page[0]+".jpg", "w")
-				
-				data = req.read()
-				f.write(data)
-				
-				f.close()
-				
+				tr = 0
+				while tr < 3:
+					try:
+						req = ul2.urlopen(self.IMG_BASE_PATH+page[1])
+						
+						form = page[1].split(".")[-1]
+						f = open(fileUri+str(page[0])+"."+form, "w")
+						
+						data = req.read()
+						f.write(data)				
+						f.close()
+						
+						downloaded += 1
+						
+						if progressNotify:
+							progressNotify(int(100*downloaded/size))
+						
+						tr = 5
+					except:
+						tr += 1
+						time.sleep(1)
+						
 			
 		self.downloadLock.release()
 		return fileUri

@@ -34,6 +34,7 @@ class QueueWindow (SecondaryWindow):
 	tasks = []
 	tasksLock = th.Lock()
 	activeTaskLock = th.Lock()
+	tasksListLock = th.Lock()
 	n = 0
 	
 	def __init__(self):
@@ -51,7 +52,7 @@ class QueueWindow (SecondaryWindow):
 		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 		mainBox.pack_start(sw, True, True, 0)
 		
-		self.tasksList = gtk.ListStore(int, str, str)
+		self.tasksList = gtk.ListStore(int, str, int)
 		self.tasksListView = gtk.TreeView(self.tasksList)
 		self.tasksListView.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
 		
@@ -63,10 +64,9 @@ class QueueWindow (SecondaryWindow):
 		rendererText = gtk.CellRendererText()
 		column = gtk.TreeViewColumn(_("File"), rendererText, text=1)
 		column.set_sort_column_id(1)
-		self.tasksListView.append_column(column)
+		self.tasksListView.append_column(column)	
 		
-		rendererText = gtk.CellRendererText()
-		column = gtk.TreeViewColumn(_("State"), rendererText, text=2)
+		column = gtk.TreeViewColumn(_("Progress"), gtk.CellRendererProgress(), value=2)
 		column.set_sort_column_id(2)
 		self.tasksListView.append_column(column)
   
@@ -77,14 +77,17 @@ class QueueWindow (SecondaryWindow):
 		self.tasksLock.acquire()
 		for x in self.tasks:
 			if x != None:
+				self.tasksLock.release()
 				return x
 		
-		return None
 		self.tasksLock.release()
+		return None
+		
 		
 	class DownloadThread(th.Thread):
 		qw = None 
 		fileName = ""
+		progressFunc = None
 		
 		def __init__(self, i, mangaEden, mangaCode, chapterNumber, destination, formatType, queueWindow):
 			th.Thread.__init__(self)
@@ -95,66 +98,55 @@ class QueueWindow (SecondaryWindow):
 			self.chapterNumber = chapterNumber
 			self.destination = destination
 			self.formatType = formatType
-			self.fileName = mangaEden.getMangaChapterFileName(mangaCode, chapterNumber, destination)
+			self.fileName = mangaEden.getMangaChapterFileName(mangaCode, chapterNumber, destination, formatType)
 			
 		def run(self):
-			fname = self.mangaEden.getMangaChapter(self.mangaCode, self.chapterNumber, self.destination, self.formatType)
+			fname = self.mangaEden.getMangaChapter(self.mangaCode, self.chapterNumber, self.destination, self.formatType, self.progressFunc)
 				
 			self.qw.tasksLock.acquire()
 			self.qw.tasks[self.i] = None
 			self.qw.tasksLock.release()
 			
-			self.qw.activeTaskLock.acquire()
-			self.qw.activeTask = self.qw.getNextTask()
-			
-			if self.qw.activeTask != None:
-				self.qw.activeTask.start()
-			self.qw.activeTaskLock.release()
-			
-			self.qw.updateList()
+			self.qw.runNext()
 
-			print "Download of", fname, "completed"
-			#gdk.threads_enter()		
-			#_ = Locale()._
-			#md = gtk.MessageDialog(self.window, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, fname)
-			#md.set_title(_("Download Complete"))
-			#md.run()
-			#md.destroy()
-			#gdk.threads_leave()		
+			print "Download of", fname, "completed"	
 		
 	
-	def updateList(self):
-		_ = Locale()._
-		self.tasksList.clear()
-		
+	
+	def runNext(self):
 		self.activeTaskLock.acquire()
-		self.tasksLock.acquire()
-		
-		print self.tasks
-		
-		for x in self.tasks:
-			if x != None:
-				self.tasksList.append([int(x.i), str(x.fileName), _("Active") if (self.activeTask == x) else _("Queued")])	
+		self.activeTask = self.getNextTask()
 			
-			
-		self.tasksLock.release()
-		self.activeTaskLock.release()
-			
+		if self.activeTask != None:
+			print "Starting next..."
+			self.activeTask[0].start()
+		self.activeTaskLock.release()		
 		
+	
+	def setRowProgress(self, rowIter, progress):
+		self.tasksListLock.acquire()
+		self.tasksList[rowIter][2] = progress
+		self.tasksListLock.release()
+	
 	def add(self, mangaEden, mangaCode, chapterNumber, destination, formatType="pdf"):
 		_ = Locale()._
 		t = self.DownloadThread(self.n, mangaEden, mangaCode, chapterNumber, destination, formatType, self)
+					
+		self.n+=1				
 		
-		self.tasksLock.acquire()
-		self.tasks.append(t)
-		self.tasksLock.release()
+		self.tasksListLock.acquire()
+		it = self.tasksList.append([int(t.i), str(t.fileName), 0])	
+		self.tasksListLock.release()
+		t.progressFunc = (lambda progress: self.setRowProgress(it,progress))
 				
-		self.n+=1		
+		self.tasksLock.acquire()
+		self.tasks.append([t, it])
+		self.tasksLock.release()
 		
 		self.activeTaskLock.acquire()
-		
-		self.tasksList.append([int(t.i), str(t.fileName), _("Active") if (self.activeTask == None) else _("Queued")])	
 		if self.activeTask == None:
-			self.activeTask = t
-			t.start()
+			self.activeTaskLock.release()
+			self.runNext()
+			return
 		self.activeTaskLock.release()
+		
