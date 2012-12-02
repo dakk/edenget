@@ -245,10 +245,14 @@ class MainWindow:
 		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 		vbox.pack_start(sw, True, True, 0)
 		
-		self.chapterList = gtk.ListStore(int, str, str)
+		self.chapterList = gtk.ListStore(str, str, str)
 		self.chapterListView = gtk.TreeView(self.chapterList)
 		self.chapterListView.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-		self.chapterListView.connect('cursor-changed', self.onSelectedChapter)
+		#self.chapterListView.connect('cursor-changed', self.onSelectedChapter)
+		selection = self.chapterListView.get_selection()
+		selection.set_mode(gtk.SELECTION_MULTIPLE)
+		selection.connect("changed", self.onSelectedChapter)
+        
 
 		rendererText = gtk.CellRendererText()
 		column = gtk.TreeViewColumn("", rendererText, text=0)
@@ -330,7 +334,12 @@ class MainWindow:
 
 	def onDownload(self, window):
 		if self.selectedChapters == None:
-			pass
+			_ = Locale()._
+			md = gtk.MessageDialog(self.window, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _("You should select at least one chapter."))
+			md.set_title(_("No chapter selected"))
+			md.run()
+			md.destroy()
+			return
 			
 		if self.preferencesWindow.folderUri == None:
 			self.preferencesWindow.onChooseDestination(window)
@@ -342,7 +351,12 @@ class MainWindow:
 			
 	def onDownloadAll(self, window):
 		if self.mangaInfo == None:
-			pass
+			_ = Locale()._
+			md = gtk.MessageDialog(self.window, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _("You should select a manga."))
+			md.set_title(_("No manga selected"))
+			md.run()
+			md.destroy()
+			return
 			
 		if self.preferencesWindow.folderUri == None:
 			self.preferencesWindow.onChooseDestination(window)		
@@ -362,8 +376,6 @@ class MainWindow:
 			selected.append(model.get_value(iter, 0))
 			
 		selection.selected_foreach(foreach, self.selectedChapters)
-    
-		#[tree_model.get_value(tree_iter, 1), tree_model.get_value(tree_iter, 0)]
 		
 		
 	def onSelectedManga(self, widget, data = None):
@@ -380,7 +392,7 @@ class MainWindow:
 		
 		try:
 			for x in self.mangaEden.getMangaChaptersList(self.selectedManga[1]):	
-				self.chapterList.append([int(x[1]), x[2], x[0]])	
+				self.chapterList.append([str(x[1]), str(x[2]), str(x[0])])	
 		
 			self.mangaInfo = self.mangaEden.getMangaInfo(self.selectedManga[1])
 		except:

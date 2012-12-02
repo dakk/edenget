@@ -78,9 +78,9 @@ class MangaEden (Mirror):
 		data = ul.urlopen("http://www.mangaeden.com/api/manga/"+str(mangaCode)+"/").read()
 			
 		l = []
-		jd = js.loads(data)
+		jd = js.loads(data)	
 		
-		return [self.LANGUAGES[int(jd['language'])][2], jd['alias'], self.IMG_BASE_PATH+str(jd['image']) if jd['image'] != None else None, jd['description']]
+		return [self.LANGUAGES[int(jd['language'])][2], jd['alias'], self.IMG_BASE_PATH+str(jd['image']) if jd['image'] != None else None, jd['description'], jd['chapters']]
 		
 		
 
@@ -88,7 +88,7 @@ class MangaEden (Mirror):
 	""" Get the file path of a chapter """
 	def getMangaChapterFileName(self, mangaCode, chapterNumber, destination, formatType="pdf"):
 		la = self.getMangaInfo(mangaCode)
-		
+				
 		if formatType == "pdf":
 			return destination+os.sep+la[1]+os.sep+la[1]+"_"+str(chapterNumber)+".pdf"
 		elif formatType == "image":
@@ -170,7 +170,7 @@ class MangaEden (Mirror):
 			chapterCode = None
 						
 			for chap in jd:
-				if chap[0] == chapterNumber:
+				if str(chap[0]) == str(chapterNumber):
 					chapterCode = chap[3]
 					break
 			
