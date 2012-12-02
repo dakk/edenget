@@ -149,8 +149,7 @@ class QueueWindow (SecondaryWindow):
 		self.tasks.append(t)
 		self.tasksLock.release()
 				
-		self.n+=1
-		
+		self.n+=1		
 		
 		self.activeTaskLock.acquire()
 		

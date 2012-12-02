@@ -144,6 +144,14 @@ class MainWindow:
 		self.languageCombo.connect('changed', self.onLanguageComboChanged)
 		toolbar.append_element(gtk.TOOLBAR_CHILD_WIDGET, self.languageCombo, None, None, None, None, None, None)
 		
+		
+		self.formatCombo = gtk.combo_box_new_text()
+		for x in self.mangaEden.formatTypes:
+			self.formatCombo.insert_text(x, self.mangaEden.formatTypes[x])
+			
+		self.formatCombo.set_active(1)
+		toolbar.append_element(gtk.TOOLBAR_CHILD_WIDGET, self.formatCombo, None, None, None, None, None, None)
+		
 		mainBox.pack_start(toolbar, False, False, 0)
 
 		
@@ -329,7 +337,7 @@ class MainWindow:
 			
 		for x in self.selectedChapters:
 			#self.mangaEden.getMangaChapter(self.selectedManga[1], x, self.preferencesWindow.folderUri)
-			self.queueWindow.add(self.mangaEden, self.selectedManga[1], x, self.preferencesWindow.folderUri)
+			self.queueWindow.add(self.mangaEden, self.selectedManga[1], x, self.preferencesWindow.folderUri, self.formatCombo.get_active_text())
 			
 			
 	def onDownloadAll(self, window):
@@ -340,7 +348,7 @@ class MainWindow:
 			self.preferencesWindow.onChooseDestination(window)		
 			
 		for x in self.mangaEden.getMangaChaptersList(self.selectedManga[1]):	
-			self.queueWindow.add(self.mangaEden, self.selectedManga[1], x[0], self.preferencesWindow.folderUri)
+			self.queueWindow.add(self.mangaEden, self.selectedManga[1], x[0], self.preferencesWindow.folderUri, self.formatCombo.get_active_text())
 		
 			
 			

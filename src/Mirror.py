@@ -14,10 +14,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
+import threading as th
 
 """ Abstract class that represent a mirror where I can get mangas """
 class Mirror:
+	""" 
+		The mirror can download only a file at time. The getMangaChapter 
+		acquire and release the lock 
+	"""
+	downloadLock = th.Lock()
+	
+	""" Supported formatType """
+	formatTypes = None
+	
 	def __init__(self, user=None, password=None):
 		self.user = user
 		self.password = password
@@ -31,10 +40,16 @@ class Mirror:
 	def getLanguageList(self):
 		raise BaseException("Abstract method not implementated")
 			
-	
+			
+	""" Return manga infos as [language, alias, image, description] """
 	def getMangaInfo(self, mangaCode):
 		raise BaseException("Abstract method not implementated")
-		
+	
+	
+	""" Get the file path of a chapter """
+	def getMangaChapterFileName(self, mangaCode, chapterNumber, destination, formatType):
+		raise BaseException("Abstract method not implementated")
+	
 		
 	""" 
 		Return the list of available mangas for a given language code.

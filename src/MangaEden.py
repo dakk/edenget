@@ -30,6 +30,7 @@ class MangaEden (Mirror):
 	
 	def __init__(self, user, password):
 		Mirror.__init__(self, user, password)
+		self.formatTypes = {0:"pdf", 1:"png"}
 	
 	""" Return the name of the mirror """
 	def getName(self):
@@ -83,42 +84,96 @@ class MangaEden (Mirror):
 		
 
 
-
+	""" Get the file path of a chapter """
 	def getMangaChapterFileName(self, mangaCode, chapterNumber, destination, formatType="pdf"):
 		la = self.getMangaInfo(mangaCode)
-		return destination+os.sep+la[1]+"_"+str(chapterNumber)+".pdf"
-
+		
+		if formatType == "pdf":
+			return destination+os.sep+la[1]+"_"+str(chapterNumber)+".pdf"
+		elif formatType == "png":
+			return destination+os.sep+la[1]+os.sep+str(chapterNumber)+os.sep
+		
+		return None
 		
 	""" Download a single chapter and save it in the given destination """
 	def getMangaChapter(self, mangaCode, chapterNumber, destination, formatType="pdf"):
+		self.downloadLock.acquire()
+		
 		self.user = "edenget"
 		self.password = "pwedenget"
 		
 		la = self.getMangaInfo(mangaCode)
+
+		fileUri = self.getMangaChapterFileName(mangaCode, chapterNumber, destination, formatType)
 		
-		url = "http://www.mangaeden.com/"+la[0]+"-"+formatType+"/"+la[1]+"/"+str(chapterNumber)+"/"
-		fileUri = destination+os.sep+la[1]+"_"+str(chapterNumber)+".pdf"
-
-		# Login and get coockie
-		login_data = ul.urlencode({ 'username' : self.user, 'password' : self.password })
-
-		cj = cookielib.CookieJar()
-		opener = ul2.build_opener(ul2.HTTPCookieProcessor(cj))
-		data = opener.open("http://www.mangaeden.com/login/", login_data).read()	
-
-		if data.find("Invalid username and password combination") != -1:
-			return None
+		if formatType == "pdf":
+			os.makedirs(fileUri.split(os.sep)[:-1])
 			
-		# Get the chapter
-		opener = ul2.build_opener(ul2.HTTPCookieProcessor(cj))
-		req = opener.open(url)
+			url = "http://www.mangaeden.com/"+la[0]+"-"+formatType+"/"+la[1]+"/"+str(chapterNumber)+"/"
 
-		f = open(fileUri, "w")
-		
-		while data != "":
-			data = req.read(1024)
-			f.write(data)
-		
-		f.close()
-		
+			# Login and get coockie
+			login_data = ul.urlencode({ 'username' : self.user, 'password' : self.password })
+
+			cj = cookielib.CookieJar()
+			opener = ul2.build_opener(ul2.HTTPCookieProcessor(cj))
+			data = opener.open("http://www.mangaeden.com/login/", login_data).read()	
+
+			if data.find("Invalid username and password combination") != -1:
+				return None
+				
+			# Get the chapter
+			opener = ul2.build_opener(ul2.HTTPCookieProcessor(cj))
+			req = opener.open(url)
+
+			f = open(fileUri, "w")
+			
+			while data != "":
+				data = req.read(1024)
+				f.write(data)
+			
+			f.close()
+			
+			
+		elif formatType == "png":
+			os.makedirs(fileUri)
+			
+			# Get the chapter code
+			data = ul.urlopen("http://www.mangaeden.com/api/manga/"+str(mangaCode)+"/").read()
+				
+			jd = js.loads(data)['chapters']
+			chapterCode = None
+			
+			for chap in jd:
+				if chap[0] == chapterNumber:
+					chpaterCode = chap[3]
+					break
+			
+			if chapterCode == None:
+				return None		
+			
+			# Get the list of pages
+			data = ul.urlopen("http://www.mangaeden.com/api/chapter/"+str(chpaterCode)+"/").read()
+				
+			l = []
+			jd = js.loads(data)['images']
+			urlList = []
+			
+			for page in jd:
+				urlList.append([jd[0], jd[1]])
+				
+			print urlList
+			
+			
+			# Download each page
+			for page in urlList:
+				req = ul2.urlopen(page[1])
+				f = open(fileUri+page[0]+".jpg", "w")
+				
+				data = req.read()
+				f.write(data)
+				
+				f.close()
+				
+			
+		self.downloadLock.release()
 		return fileUri
