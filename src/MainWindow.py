@@ -150,6 +150,7 @@ class MainWindow:
 			self.formatCombo.insert_text(x, self.mangaEden.formatTypes[x])
 			
 		self.formatCombo.set_active(1)
+		self.formatCombo.set_state(gtk.STATE_INSENSITIVE)
 		toolbar.append_element(gtk.TOOLBAR_CHILD_WIDGET, self.formatCombo, None, None, None, None, None, None)
 		
 		mainBox.pack_start(toolbar, False, False, 0)

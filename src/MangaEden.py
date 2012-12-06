@@ -87,7 +87,11 @@ class MangaEden (Mirror):
 
 	""" Get the file path of a chapter """
 	def getMangaChapterFileName(self, mangaCode, chapterNumber, destination, formatType="pdf"):
-		la = self.getMangaInfo(mangaCode)
+		try:
+			la = self.getMangaInfo(mangaCode)
+		except:
+			raise Exception('networkError')
+
 				
 		if formatType == "pdf":
 			return destination+os.sep+la[1]+os.sep+la[1]+"_"+str(chapterNumber)+".pdf"
@@ -98,16 +102,15 @@ class MangaEden (Mirror):
 		
 		
 	""" Download a single chapter and save it in the given destination """
-	def getMangaChapter(self, mangaCode, chapterNumber, destination, formatType="pdf", progressNotify = None):
+	def getMangaChapter(self, mangaCode, chapterNumber, destination, formatType="pdf", stopEvent, progressNotify = None):
 		self.downloadLock.acquire()
 		
 		self.user = "edenget"
 		self.password = "pwedenget"
 		
 		la = self.getMangaInfo(mangaCode)
-
 		fileUri = self.getMangaChapterFileName(mangaCode, chapterNumber, destination, formatType)
-		
+
 		if formatType == "pdf":
 			try:
 				os.makedirs(destination+os.sep+la[1])
@@ -118,21 +121,20 @@ class MangaEden (Mirror):
 
 			# Login and get coockie
 			login_data = ul.urlencode({ 'username' : self.user, 'password' : self.password })
+			
 
 			cj = cookielib.CookieJar()
 			opener = ul2.build_opener(ul2.HTTPCookieProcessor(cj))
 			data = opener.open("http://www.mangaeden.com/login/", login_data).read()	
 			
-			
-
 			if data.find("Invalid username and password combination") != -1:
 				self.downloadLock.release()
-				return None
+				raise Exception('loginError')
 				
 				
 			# Get the chapter
 			tr = 0
-			while tr < 3:
+			while tr < 3 and (not stopEvent.is_set()):
 				try:
 					opener = ul2.build_opener(ul2.HTTPCookieProcessor(cj))
 					req = opener.open(url)
@@ -143,7 +145,7 @@ class MangaEden (Mirror):
 
 					f = open(fileUri, "w")
 					
-					while data != "":
+					while data != "" and (not stopEvent.is_set()):
 						data = req.read(1024)
 						f.write(data)
 						downloaded += 1024
@@ -156,6 +158,9 @@ class MangaEden (Mirror):
 				except:
 					tr += 1
 					time.sleep(1)
+			if tr > 4:
+				self.downloadLock.release()
+				raise Exception('networkError')
 			
 		elif formatType == "image":
 			try:
@@ -177,7 +182,7 @@ class MangaEden (Mirror):
 			
 			if chapterCode == None:
 				self.downloadLock.release()
-				return None		
+				raise Exception('invalidChapterError')
 			
 			
 			# Get the list of pages
@@ -201,6 +206,9 @@ class MangaEden (Mirror):
 				tr = 0
 				while tr < 3:
 					try:
+						if stopEvent.is_set():
+							raise None
+							
 						req = ul2.urlopen(self.IMG_BASE_PATH+page[1])
 						
 						form = page[1].split(".")[-1]

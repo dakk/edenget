@@ -35,6 +35,7 @@ class QueueWindow (SecondaryWindow):
 	tasksLock = th.Lock()
 	activeTaskLock = th.Lock()
 	tasksListLock = th.Lock()
+	selectedTasks = []
 	n = 0
 	
 	def __init__(self):
@@ -70,8 +71,61 @@ class QueueWindow (SecondaryWindow):
 		column.set_sort_column_id(2)
 		self.tasksListView.append_column(column)
   
+  
+		selection = self.tasksListView.get_selection()
+		selection.set_mode(gtk.SELECTION_MULTIPLE)
+		selection.connect("changed", self.onSelectedTasks)
+		
 		sw.add(self.tasksListView)
+		
+		
+		# Toolbar
+		toolbar = gtk.Toolbar()
+		toolbar.set_style(gtk.TOOLBAR_BOTH_HORIZ)
+
+		iconw = gtk.Image()
+		iconw.set_from_stock(gtk.STOCK_DELETE, gtk.ICON_SIZE_LARGE_TOOLBAR)
+		toolbar.append_item(_("Delete"), "", "Private", iconw, self.onDeleteTask)	
+
+		iconw = gtk.Image()
+		iconw.set_from_stock(gtk.STOCK_CLOSE, gtk.ICON_SIZE_LARGE_TOOLBAR)
+		toolbar.append_item(_("Close"), "", "Private", iconw, lambda w: self.changeVisibility())	
+		  
+		mainBox.pack_start(toolbar, False, False, 0)
+
 	
+	
+	def onSelectedTasks(self, w):
+		selection = self.tasksListView.get_selection()
+		selection.set_mode(gtk.SELECTION_MULTIPLE)
+		
+		self.selectedChapters = []
+		
+		def foreach(model, path, iter, selected):
+			selected.append([model.get_value(iter, 0),model.get_value(iter, 1)])
+			
+		selection.selected_foreach(foreach, self.selectedTasks)
+		
+		
+	def onDeleteTask(self, w):
+		for task in self.selectedTasks:
+			i = task[0]
+			self.tasksLock.acquire()
+			if self.tasks[i] == None:
+				self.tasksLock.release()
+				return		
+			
+			self.activeTaskLock.acquire()
+			if self.tasks[i][1] == self.activeTask:
+				self.tasks[i][1].stop()
+				self.tasks[i][1].progressFunc("Stopped")
+				self.tasks[i] = None
+				self.runNext()
+			else:
+				self.tasks[i] = None
+			self.activeTaskLock.release()
+			
+			self.tasksLock.release()
 	
 	def getNextTask(self):
 		self.tasksLock.acquire()
@@ -88,9 +142,12 @@ class QueueWindow (SecondaryWindow):
 		qw = None 
 		fileName = ""
 		progressFunc = None
+		stopEvent = None
 		
 		def __init__(self, i, mangaEden, mangaCode, chapterNumber, destination, formatType, queueWindow):
 			th.Thread.__init__(self)
+			self.stopEvent = th.Event()
+			
 			self.i = i
 			self.qw = queueWindow
 			self.mangaEden = mangaEden
@@ -101,8 +158,15 @@ class QueueWindow (SecondaryWindow):
 			self.fileName = mangaEden.getMangaChapterFileName(mangaCode, chapterNumber, destination, formatType)
 			
 		def run(self):
-			fname = self.mangaEden.getMangaChapter(self.mangaCode, self.chapterNumber, self.destination, self.formatType, self.progressFunc)
-				
+			fname = None
+			try:
+				fname = self.mangaEden.getMangaChapter(self.mangaCode, self.chapterNumber, self.destination, self.formatType, self.stopEvent, self.progressFunc)
+			except Exception as e:
+				er = e.args[0]
+
+				self.progressFunc("Failed")
+				#print er
+
 			self.qw.tasksLock.acquire()
 			self.qw.tasks[self.i] = None
 			self.qw.tasksLock.release()
@@ -111,7 +175,10 @@ class QueueWindow (SecondaryWindow):
 
 			print "Download of", fname, "completed"	
 		
-	
+		def stop(self):
+			self.stopEvent.set()
+			super(DownloadThread, self).join(None)
+
 	
 	def runNext(self):
 		self.activeTaskLock.acquire()
@@ -124,9 +191,14 @@ class QueueWindow (SecondaryWindow):
 		
 	
 	def setRowProgress(self, rowIter, progress):
-		self.tasksListLock.acquire()
-		self.tasksList[rowIter][2] = progress
-		self.tasksListLock.release()
+		if type(progress) == str:
+			self.tasksListLock.acquire()
+			self.tasksList[rowIter][2] = progress
+			self.tasksListLock.release()
+		else:
+			self.tasksListLock.acquire()
+			self.tasksList[rowIter][2] = progress
+			self.tasksListLock.release()
 	
 	def add(self, mangaEden, mangaCode, chapterNumber, destination, formatType="pdf"):
 		_ = Locale()._
