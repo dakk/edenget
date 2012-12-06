@@ -23,6 +23,7 @@ import locale
 import os
 import sys
 import gettext
+import thread
 import threading as th
 
 import MirrorList
@@ -434,6 +435,7 @@ class MainWindow:
 		
 	def destroy(self, widget, data = None):			
 		gtk.main_quit()
+		os._exit(0)
 		
 	
 	def onChangeLoginData(self, username, password):

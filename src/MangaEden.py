@@ -102,7 +102,7 @@ class MangaEden (Mirror):
 		
 		
 	""" Download a single chapter and save it in the given destination """
-	def getMangaChapter(self, mangaCode, chapterNumber, destination, formatType="pdf", stopEvent, progressNotify = None):
+	def getMangaChapter(self, mangaCode, chapterNumber, destination, formatType="pdf", stopEvent = None, progressNotify = None):
 		self.downloadLock.acquire()
 		
 		self.user = "edenget"

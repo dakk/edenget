@@ -24,6 +24,7 @@ class SecondaryWindow:
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		self.window.connect("delete_event", self.onDestroy)
 		self.window.connect("destroy", lambda w: None)
+		self.window.set_deletable(False)
 		self.window.set_title(title)
 		#self.window.set_modal(True)
 		self.window.hide_all()

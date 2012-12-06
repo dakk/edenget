@@ -65,6 +65,6 @@ class Mirror:
 		
 		
 	""" Download a single chapter and save it in the given destination """
-	def getMangaChapter(self, mangaCode, chapterNumber, destination, formatType, stopEvent, progressFunc = None):
+	def getMangaChapter(self, mangaCode, chapterNumber, destination, formatType, stopEvent = None, progressFunc = None):
 		raise BaseException("Abstract method not implementated")
 		

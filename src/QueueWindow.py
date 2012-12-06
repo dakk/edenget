@@ -83,9 +83,9 @@ class QueueWindow (SecondaryWindow):
 		toolbar = gtk.Toolbar()
 		toolbar.set_style(gtk.TOOLBAR_BOTH_HORIZ)
 
-		iconw = gtk.Image()
-		iconw.set_from_stock(gtk.STOCK_DELETE, gtk.ICON_SIZE_LARGE_TOOLBAR)
-		toolbar.append_item(_("Delete"), "", "Private", iconw, self.onDeleteTask)	
+		#iconw = gtk.Image()
+		#iconw.set_from_stock(gtk.STOCK_DELETE, gtk.ICON_SIZE_LARGE_TOOLBAR)
+		#toolbar.append_item(_("Delete"), "", "Private", iconw, self.onDeleteTask)	
 
 		iconw = gtk.Image()
 		iconw.set_from_stock(gtk.STOCK_CLOSE, gtk.ICON_SIZE_LARGE_TOOLBAR)
