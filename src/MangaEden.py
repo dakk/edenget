@@ -29,7 +29,7 @@ class MangaEden (Mirror):
 	LANGUAGES = [["0", "English", "en"], ["1", "Italiano", "it"]] 
 	IMG_BASE_PATH = "http://cdn.mangaeden.com/mangasimg/"
 	
-	def __init__(self, user, password):
+	def __init__(self, user = None, password = None):
 		Mirror.__init__(self, user, password)
 		self.formatTypes = {0:"pdf", 1:"image"}
 	
@@ -105,8 +105,8 @@ class MangaEden (Mirror):
 	def getMangaChapter(self, mangaCode, chapterNumber, destination, formatType="pdf", stopEvent = None, progressNotify = None):
 		self.downloadLock.acquire()
 		
-		self.user = "edenget"
-		self.password = "pwedenget"
+		#self.user = ""
+		#self.password = ""
 		
 		la = self.getMangaInfo(mangaCode)
 		fileUri = self.getMangaChapterFileName(mangaCode, chapterNumber, destination, formatType)

@@ -147,8 +147,8 @@ class MainWindow:
 		
 		
 		self.formatCombo = gtk.combo_box_new_text()
-		for x in self.mangaEden.formatTypes:
-			self.formatCombo.insert_text(x, self.mangaEden.formatTypes[x])
+		for x in MangaEden().formatTypes:
+			self.formatCombo.insert_text(x, MangaEden().formatTypes[x])
 			
 		self.formatCombo.set_active(1)
 		self.formatCombo.set_state(gtk.STATE_INSENSITIVE)
@@ -299,7 +299,7 @@ class MainWindow:
 		d.set_wrap_license(True)
 		
 		d.set_logo(window.render_icon(gtk.STOCK_DIALOG_INFO, gtk.ICON_SIZE_DIALOG))
-		d.set_name(APP_NAME)
+		d.set_name("EdenGet")
 		d.run()
 		d.destroy()
 		
