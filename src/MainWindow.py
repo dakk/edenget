@@ -28,6 +28,7 @@ import threading as th
 
 import MirrorList
 from MangaEden import MangaEden
+from Bookmarks import Bookmarks
 import QueueWindow
 import PreferencesWindow
 from Locale import Locale
@@ -65,6 +66,7 @@ class MainWindow:
 	mangaEden = None
 	queueWindow = None
 	preferencesWindow = None
+	bookmarks = Bookmarks()
 	lang = 1
 	
 	def __init__(self):	
@@ -206,6 +208,7 @@ class MainWindow:
 		self.marksList = gtk.ListStore(str, str)
 		self.marksListView = gtk.TreeView(self.marksList)
 		self.marksListView.connect('cursor-changed', self.onSelectedManga, self.marksListView)
+		self.marksListView.connect('button_press_event', self.onMangaListContextMenu)
 
 		rendererText = gtk.CellRendererText()
 		column = gtk.TreeViewColumn(_("Name"), rendererText, text=1)
@@ -225,6 +228,7 @@ class MainWindow:
 		self.mangaList = gtk.ListStore(str, str)
 		self.mangaListView = gtk.TreeView(self.mangaList)
 		self.mangaListView.connect('cursor-changed', self.onSelectedManga, self.mangaListView)
+		self.mangaListView.connect('button_press_event', self.onMangaListContextMenu)
 
 		rendererText = gtk.CellRendererText()
 		column = gtk.TreeViewColumn(_("Name"), rendererText, text=1)
@@ -288,7 +292,66 @@ class MainWindow:
 		self.mangaEden = MangaEden("", "")
 		self.onLanguageComboChanged(self.window)
 		
+		
+		self.addBookmarkPopup = gtk.Menu()
+		it = gtk.ImageMenuItem(gtk.STOCK_ADD)
+		it.connect('activate', lambda w: self.onBookmark(True))
+		#save = gtk.MenuItem(_("Save as bookmark")
+		#save.connect('activate', lambda w: pass)
+		self.addBookmarkPopup.append(it)
+		self.addBookmarkPopup.show_all()
+		
+		
+		
+		self.removeBookmarkPopup = gtk.Menu()
+		it = gtk.ImageMenuItem(gtk.STOCK_REMOVE)
+		it.connect('activate', lambda w: self.onBookmark(False))
+		#save = gtk.MenuItem(_("Save as bookmark")
+		#save.connect('activate', lambda w: pass)
+		self.removeBookmarkPopup.append(it)
+		self.removeBookmarkPopup.show_all()
+		
+		
+		notebook.connect('switch-page', lambda w, p, p1: self.chapterList.clear())
+		self.onBookmarkPopulate()
+		
 
+	def onBookmark(self, isSave):
+		if isSave:
+			self.bookmarks.add(self.selectedManga)
+		else:
+			self.bookmarks.delete(self.selectedManga)
+		self.onBookmarkPopulate()
+			
+	def onBookmarkPopulate(self):
+		self.marksList.clear()
+		
+		self.mangas = self.bookmarks.get()
+		
+		for x in self.mangas:	
+			self.marksList.append([x[1], x[0]])	
+
+	def onMangaListContextMenu(self, treeview, event):
+		if event.button == 3:
+			x = int(event.x)
+			y = int(event.y)
+			time = event.time
+			pthinfo = treeview.get_path_at_pos(x, y)
+			
+			if pthinfo == None:
+				return False
+				
+			path, col, cellx, celly = pthinfo
+			treeview.grab_focus()
+			treeview.set_cursor(path, col, 0)
+			
+			if treeview == self.mangaListView:
+				self.addBookmarkPopup.popup(None, None, None, event.button, time)
+			else:
+				self.removeBookmarkPopup.popup(None, None, None, event.button, time)
+
+			return True
+		return False
 
 	def onAbout(self, window):
 		_ = Locale()._
@@ -317,6 +380,7 @@ class MainWindow:
 			self.mangas = self.mangaEden.getMangaList(self.lang)
 			for x in self.mangas:	
 				self.mangaList.append([x[0], x[1]])	
+
 		except:
 			self.mangas = []
 			self.mangaList.clear()
