@@ -45,6 +45,7 @@ class Locale:
 
 	gettext.bindtextdomain(APP_NAME, local_path)
 	gettext.textdomain(APP_NAME)
+	
 			
 	lang = gettext.translation(APP_NAME, local_path, languages=langs, fallback = True)
 			

@@ -1,0 +1,162 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-12-07 17:05+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: MainWindow.py:93 QueueWindow.py:68
+msgid "File"
+msgstr ""
+
+#: MainWindow.py:105
+msgid "Edit"
+msgstr ""
+
+#: MainWindow.py:110
+msgid "Destination folder"
+msgstr ""
+
+#: MainWindow.py:121
+msgid "Help"
+msgstr ""
+
+#: MainWindow.py:137
+msgid "Download Queue"
+msgstr ""
+
+#: MainWindow.py:141
+msgid "Destination Folder"
+msgstr ""
+
+#: MainWindow.py:178
+msgid "Search"
+msgstr ""
+
+#: MainWindow.py:195 MainWindow.py:215 MainWindow.py:235
+msgid "Name"
+msgstr ""
+
+#: MainWindow.py:207
+msgid "Bookmarks"
+msgstr ""
+
+#: MainWindow.py:227
+msgid "Full List"
+msgstr ""
+
+#: MainWindow.py:270
+msgid "Title"
+msgstr ""
+
+#: MainWindow.py:281
+msgid "Download"
+msgstr ""
+
+#: MainWindow.py:285
+msgid "Download All"
+msgstr ""
+
+#: MainWindow.py:291
+msgid "Ready."
+msgstr ""
+
+#: MainWindow.py:328
+msgid "Bookmark saved."
+msgstr ""
+
+#: MainWindow.py:331
+msgid "Bookmark removed."
+msgstr ""
+
+#: MainWindow.py:369
+msgid "A multiplatform batch downloader for mangaeden.com"
+msgstr ""
+
+#: MainWindow.py:412
+msgid "You should select at least one chapter."
+msgstr ""
+
+#: MainWindow.py:413
+msgid "No chapter selected"
+msgstr ""
+
+#: MainWindow.py:431
+msgid "You should select a manga."
+msgstr ""
+
+#: MainWindow.py:432
+msgid "No manga selected"
+msgstr ""
+
+#: MainWindow.py:504
+msgid "Cannot connect to the server."
+msgstr ""
+
+#: MainWindow.py:505
+msgid "Network Error"
+msgstr ""
+
+#: PreferencesWindow.py:38
+msgid "Edenget - Preferences"
+msgstr ""
+
+#: PreferencesWindow.py:49
+msgid "Login"
+msgstr ""
+
+#: PreferencesWindow.py:63
+msgid "Username: "
+msgstr ""
+
+#: PreferencesWindow.py:70
+msgid "Password: "
+msgstr ""
+
+#: PreferencesWindow.py:77
+msgid "Filesystem"
+msgstr ""
+
+#: PreferencesWindow.py:88 PreferencesWindow.py:131
+msgid "Select"
+msgstr ""
+
+#: PreferencesWindow.py:94 QueueWindow.py:94
+msgid "Close"
+msgstr ""
+
+#: PreferencesWindow.py:129
+msgid "Select a directory to save downloaded data"
+msgstr ""
+
+#: QueueWindow.py:46
+msgid "Edenget - Download Queue"
+msgstr ""
+
+#: QueueWindow.py:72
+msgid "Progress"
+msgstr ""
+
+#: QueueWindow.py:181
+msgid "Download of "
+msgstr ""
+
+#: QueueWindow.py:181
+msgid " completed."
+msgstr ""
+
+#: QueueWindow.py:194
+msgid "Downloading "
+msgstr ""

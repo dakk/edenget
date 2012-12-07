@@ -37,9 +37,11 @@ class QueueWindow (SecondaryWindow):
 	tasksListLock = th.Lock()
 	selectedTasks = []
 	n = 0
+	mainWindow = None
 	
-	def __init__(self):
+	def __init__(self, mainw):
 		_ = Locale()._
+		self.mainWindow = mainw
 		
 		SecondaryWindow.__init__(self, _("Edenget - Download Queue"))
 		self.window.set_default_size(400, 500)
@@ -158,6 +160,7 @@ class QueueWindow (SecondaryWindow):
 			self.fileName = mangaEden.getMangaChapterFileName(mangaCode, chapterNumber, destination, formatType)
 			
 		def run(self):
+			_ = Locale()._
 			fname = None
 			try:
 				fname = self.mangaEden.getMangaChapter(self.mangaCode, self.chapterNumber, self.destination, self.formatType, self.stopEvent, self.progressFunc)
@@ -173,7 +176,9 @@ class QueueWindow (SecondaryWindow):
 			
 			self.qw.runNext()
 
-			print "Download of", fname, "completed"	
+			#print "Download of", fname, "completed"	
+			
+			self.qw.mainWindow.statusBar.push(0, _("Download of ")+fname+_(" completed."))
 		
 		def stop(self):
 			self.stopEvent.set()
@@ -181,11 +186,12 @@ class QueueWindow (SecondaryWindow):
 
 	
 	def runNext(self):
+		_ = Locale()._
 		self.activeTaskLock.acquire()
 		self.activeTask = self.getNextTask()
 			
 		if self.activeTask != None:
-			print "Starting next..."
+			self.mainWindow.statusBar.push(0, _("Downloading ")+self.tasksList[self.activeTask[1]][1]+"...")
 			self.activeTask[0].start()
 		self.activeTaskLock.release()		
 		

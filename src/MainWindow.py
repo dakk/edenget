@@ -71,7 +71,7 @@ class MainWindow:
 	
 	def __init__(self):	
 		_ = Locale()._
-		self.queueWindow = QueueWindow.QueueWindow()
+		self.queueWindow = QueueWindow.QueueWindow(self)
 		self.preferencesWindow = PreferencesWindow.PreferencesWindow(self)
 		self.preferencesWindow.loadPrefs()
 		
@@ -189,6 +189,7 @@ class MainWindow:
 		self.searchList = gtk.ListStore(str, str)
 		self.searchListView = gtk.TreeView(self.searchList)
 		self.searchListView.connect('cursor-changed', self.onSelectedManga, self.searchListView)
+		self.searchListView.connect('button_press_event', self.onMangaListContextMenu)
 
 		rendererText = gtk.CellRendererText()
 		column = gtk.TreeViewColumn(_("Name"), rendererText, text=1)
@@ -285,6 +286,10 @@ class MainWindow:
 		
   
 		vbox.pack_start(toolbar, False, False, 0)
+		
+		self.statusBar = gtk.Statusbar()
+		self.statusBar.push(0, _("Ready."))
+		mainBox.pack_start(self.statusBar, False, False, 0)
 			
 		self.window.show_all()
 		
@@ -317,18 +322,21 @@ class MainWindow:
 		
 
 	def onBookmark(self, isSave):
+		_ = Locale()._
 		if isSave:
 			self.bookmarks.add(self.selectedManga)
+			self.statusBar.push(0, _("Bookmark saved."))
 		else:
 			self.bookmarks.delete(self.selectedManga)
+			self.statusBar.push(0, _("Bookmark removed."))
 		self.onBookmarkPopulate()
 			
 	def onBookmarkPopulate(self):
 		self.marksList.clear()
 		
-		self.mangas = self.bookmarks.get()
+		mas = self.bookmarks.get()
 		
-		for x in self.mangas:	
+		for x in mas:	
 			self.marksList.append([x[1], x[0]])	
 
 	def onMangaListContextMenu(self, treeview, event):
@@ -345,7 +353,7 @@ class MainWindow:
 			treeview.grab_focus()
 			treeview.set_cursor(path, col, 0)
 			
-			if treeview == self.mangaListView:
+			if treeview == self.mangaListView or treeview == self.searchListView:
 				self.addBookmarkPopup.popup(None, None, None, event.button, time)
 			else:
 				self.removeBookmarkPopup.popup(None, None, None, event.button, time)
@@ -372,33 +380,33 @@ class MainWindow:
 		
 		self.searchList.clear()
 		self.mangaList.clear()
-		self.marksList.clear()
+		#self.marksList.clear()
 		self.chapterList.clear()
-		self.onSearchTextModified(window)
 		
 		try:
 			self.mangas = self.mangaEden.getMangaList(self.lang)
 			for x in self.mangas:	
 				self.mangaList.append([x[0], x[1]])	
-
 		except:
 			self.mangas = []
 			self.mangaList.clear()
 			self.networkError()
 
+		self.onSearchTextModified(window)
+
+
 	def onSearchTextModified(self, window):
 		if self.mangas == None:
 			return
-			
 		query = self.searchEntry.get_text()
 		
 		self.searchList.clear()
 		for x in self.mangas:
-			if x[1].lower().find(query.lower()) != -1:
+			if query == "" or (x[1].lower().find(query.lower()) != -1):
 				self.searchList.append([x[0], x[1]])	
 
 
-	def onDownload(self, window):
+	def onDownload(self, window):		
 		if self.selectedChapters == None:
 			_ = Locale()._
 			md = gtk.MessageDialog(self.window, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _("You should select at least one chapter."))
@@ -407,6 +415,8 @@ class MainWindow:
 			md.destroy()
 			return
 			
+		self.queueWindow.window.show_all()
+		
 		if self.preferencesWindow.folderUri == None:
 			self.preferencesWindow.onChooseDestination(window)
 			

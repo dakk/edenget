@@ -35,8 +35,12 @@ class Bookmarks:
 		return self.marks
 	
 	def add(self, sel):
-		self.marks.append(sel)
-		self.save()
+		try:
+			self.marks.index(sel)
+		except:
+			self.marks.append(sel)
+			self.save()
+			
 	
 	def delete(self, sel):
 		self.marks.remove(sel)

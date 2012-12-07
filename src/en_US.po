@@ -1,0 +1,161 @@
+# Language locale/en translations for PACKAGE package.
+# Copyright (C) 2012 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#  <gessadavide@gmail.com>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-12-07 17:05+0100\n"
+"PO-Revision-Date: 2012-12-07 17:05+0100\n"
+"Last-Translator:  <gessadavide@gmail.com>\n"
+"Language-Team: Language locale/en\n"
+"Language: locale/en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ASCII\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: MainWindow.py:93 QueueWindow.py:68
+msgid "File"
+msgstr "File"
+
+#: MainWindow.py:105
+msgid "Edit"
+msgstr "Edit"
+
+#: MainWindow.py:110
+msgid "Destination folder"
+msgstr "Destination folder"
+
+#: MainWindow.py:121
+msgid "Help"
+msgstr "Help"
+
+#: MainWindow.py:137
+msgid "Download Queue"
+msgstr "Download Queue"
+
+#: MainWindow.py:141
+msgid "Destination Folder"
+msgstr "Destination Folder"
+
+#: MainWindow.py:178
+msgid "Search"
+msgstr "Search"
+
+#: MainWindow.py:195 MainWindow.py:215 MainWindow.py:235
+msgid "Name"
+msgstr "Name"
+
+#: MainWindow.py:207
+msgid "Bookmarks"
+msgstr "Bookmarks"
+
+#: MainWindow.py:227
+msgid "Full List"
+msgstr "Full List"
+
+#: MainWindow.py:270
+msgid "Title"
+msgstr "Title"
+
+#: MainWindow.py:281
+msgid "Download"
+msgstr "Download"
+
+#: MainWindow.py:285
+msgid "Download All"
+msgstr "Download All"
+
+#: MainWindow.py:291
+msgid "Ready."
+msgstr "Ready."
+
+#: MainWindow.py:328
+msgid "Bookmark saved."
+msgstr "Bookmark saved."
+
+#: MainWindow.py:331
+msgid "Bookmark removed."
+msgstr "Bookmark removed."
+
+#: MainWindow.py:369
+msgid "A multiplatform batch downloader for mangaeden.com"
+msgstr "A multiplatform batch downloader for mangaeden.com"
+
+#: MainWindow.py:412
+msgid "You should select at least one chapter."
+msgstr "You should select at least one chapter."
+
+#: MainWindow.py:413
+msgid "No chapter selected"
+msgstr "No chapter selected"
+
+#: MainWindow.py:431
+msgid "You should select a manga."
+msgstr "You should select a manga."
+
+#: MainWindow.py:432
+msgid "No manga selected"
+msgstr "No manga selected"
+
+#: MainWindow.py:504
+msgid "Cannot connect to the server."
+msgstr "Cannot connect to the server."
+
+#: MainWindow.py:505
+msgid "Network Error"
+msgstr "Network Error"
+
+#: PreferencesWindow.py:38
+msgid "Edenget - Preferences"
+msgstr "Edenget - Preferences"
+
+#: PreferencesWindow.py:49
+msgid "Login"
+msgstr "Login"
+
+#: PreferencesWindow.py:63
+msgid "Username: "
+msgstr "Username: "
+
+#: PreferencesWindow.py:70
+msgid "Password: "
+msgstr "Password: "
+
+#: PreferencesWindow.py:77
+msgid "Filesystem"
+msgstr "Filesystem"
+
+#: PreferencesWindow.py:88 PreferencesWindow.py:131
+msgid "Select"
+msgstr "Select"
+
+#: PreferencesWindow.py:94 QueueWindow.py:94
+msgid "Close"
+msgstr "Close"
+
+#: PreferencesWindow.py:129
+msgid "Select a directory to save downloaded data"
+msgstr "Select a directory to save downloaded data"
+
+#: QueueWindow.py:46
+msgid "Edenget - Download Queue"
+msgstr "Edenget - Download Queue"
+
+#: QueueWindow.py:72
+msgid "Progress"
+msgstr "Progress"
+
+#: QueueWindow.py:181
+msgid "Download of "
+msgstr "Download of "
+
+#: QueueWindow.py:181
+msgid " completed."
+msgstr " completed."
+
+#: QueueWindow.py:194
+msgid "Downloading "
+msgstr "Downloading "
