@@ -19,20 +19,27 @@
           <a id="forkme_banner" href="https://github.com/dakk/edenget">View on GitHub</a>
 
           <h1 id="project_title">Edenget</h1>
-          <h2 id="project_tagline">a multiplatform batch downloader for mangaeden.com</h2>
+          <h2 id="project_tagline" class="en">a multiplatform batch downloader for mangaeden.com</h2>
+          <h2 id="project_tagline" class="it">downloader automatico multipiattaforma per mangaeden.com</h2>
 
             <section id="downloads">
-              <a class="zip_download_link" href="">Download this project as a .zip windows package</a>
-              <a class="tar_download_link" href="https://github.com/dakk/edenget/tarball/master">Download this project as a tar.gz file</a>
+              <a class="zip_download_link en" href="">Download this project as a compiled windows package</a>
+              <a class="zip_download_link it" href="">Scarica il progetto compilato per windows</a>
+              <a class="tar_download_link en" href="https://github.com/dakk/edenget/tarball/master">Download this project as a tar.gz file</a>
+              <a class="tar_download_link it" href="https://github.com/dakk/edenget/tarball/master">Scarica il progetto come file tar.gz</a>
+
             </section>
         </header>
     </div>
-
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
+	  <img src="images/flag_ita.gif" style="max-width: 16px" onClick="javascript:changeLanguage(1)" />
+	  <img src="images/flag_eng.gif" style="max-width: 16px" onClick="javascript:changeLanguage(2)" />
       <section id="main_content" class="inner">
-<p>EdenGet is a multiplatform batch downloader for <a href="http://www.mangaeden.com">mangaeden.com</a>. 
+<p class="en">EdenGet is a multiplatform batch downloader for <a href="http://www.mangaeden.com">mangaeden.com</a>. 
 It runs well on Linux, Windows, Osx and all OS where you can run python2 and gtk+.</p>
+<p class="it">EdenGet e' un downloader automatico multipiattaforma per <a href="http://www.mangaeden.com">mangaeden.com</a>. 
+Funziona bene su Linux, Windows, Osx e tutti gli OS dove e' eseguibile python2 e le librerie gtk.</p>
 
 <div align="center">
 	<a href="screen/1.png"><img src="screen/1.png" style="max-width: 340px;"/></a>
@@ -66,4 +73,61 @@ friend Cristian for the idea.</p>
     
 
   </body>
+  
+  
+  
+    <script language="javascript">
+		function getElementsByClassName(classname)  
+		{
+			var a = [];
+			var re = new RegExp('\\b' + classname + '\\b');
+			
+			var node = document.getElementsByTagName("body")[0];
+
+			var els = node.getElementsByTagName("*");
+			for(var i=0,j=els.length; i<j; i++)
+				if(re.test(els[i].className))a.push(els[i]);
+			return a;
+		}
+		
+		function hideAll(classname)
+		{
+			var elements = new Array();
+			elements = getElementsByClassName(classname);
+			for(i in elements )
+			{
+				 elements[i].style.display = "none";
+			}	
+		}
+		
+		function showAll(classname)
+		{
+			var elements = new Array();
+			elements = getElementsByClassName(classname);
+			for(i in elements )
+			{
+				 elements[i].style.display = "block";
+			}	
+		}
+		
+		var lang = 1;
+		hideAll('it');
+		
+		function changeLanguage(l)
+		{
+			lang = l;
+			if(l == 1)
+			{
+				showAll('it');
+				hideAll('en');
+			}
+			else
+			{
+				showAll('en');
+				hideAll('it');
+			}
+			
+		}
+		
+    </script>
 </html>
