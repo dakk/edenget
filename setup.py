@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-from setuptools import setup, find_packages
 
 import os
 import platform
@@ -36,25 +35,13 @@ if os.name == "nt":
 
 
 	includes = ["locale", "gio", "cairo", "pangocairo", "pango",
-				"atk", "gobject", "os", "code", "winsound", "win32api",
-				"plistlib", "win32gui", "OpenSSL", "Crypto", "Queue", "sqlite3",
-				"glob", "webbrowser", "json", "imaplib", "cgi", "gzip", "uuid",
-				"platform", "imghdr", "ctypes", "optparse", "plugin_base",
-				"pyfb", "papyon", "e3.xmpp", "plugins", "webkit",
-				"unicodedata", "dnspython"]
+				"atk", "gobject", "os", "win32api", "json", "gettext",
+				"platform", "ctypes"]
 	
 	opts = {
 		"py2exe": {
-			"packages": ["encodings", "gtk", "OpenSSL", "Crypto", "xml",
-						 "xml.etree", "xml.etree.ElementTree"],
+			"packages": ["encodings", "gtk", "gettext"],
 			"includes": includes,
-			"excludes": ["appindicator", "ltihooks", "pywin", "pywin.debugger",
-				"pywin.debugger.dbgcon", "pywin.dialogs",
-				"pywin.dialogs.list", "Tkconstants", "Tkinter", "tcl",
-				"doctest", "macpath", "pdb", "cookielib", "ftplib",
-				"pickle", "win32wnet", "unicodedata",
-				"getopt", "gdk"],
-			"dll_excludes": ["libglade-2.0-0.dll", "w9xpopen.exe"],
 			"optimize": "2",
 			"dist_dir": "dist",
 			"skip_archive": 1
@@ -75,6 +62,8 @@ if os.name == "nt":
 	print "done! files at: dist"
 
 else:
+	from setuptools import setup, find_packages
+	
 	# Data files to be installed to the system
 	_data_files = [	]
 
