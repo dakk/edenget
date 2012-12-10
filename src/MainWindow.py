@@ -33,7 +33,7 @@ import QueueWindow
 import PreferencesWindow
 from Locale import Locale
 
-gtk.gdk.threads_init()
+#gtk.gdk.threads_init()
 
 
 
