@@ -214,7 +214,7 @@ class MangaEden (Mirror):
 						req = ul2.urlopen(self.IMG_BASE_PATH+page[1])
 						
 						form = page[1].split(".")[-1]
-						f = open(fileUri+str(page[0])+"."+form, "w")
+						f = open(fileUri+str(page[0])+"."+form, "wb")
 						
 						data = req.read()
 						f.write(data)				
