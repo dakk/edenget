@@ -54,7 +54,7 @@ if os.name == "nt":
 		
 	setup(
 		requires	= ["gtk"],
-		windows	= [{"script": "src/main.py", "dest_base": "edenget"}],
+		windows	= [{"script": "src/main.py", "icon_resources": [(1, "theme/icon.ico")], "dest_base": "edenget"}],
 		options	= opts,
 		data_files = _data_files,
 		**setup_info
