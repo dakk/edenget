@@ -87,7 +87,6 @@ class MangaEden (Mirror):
 
 	""" Get the file path of a chapter """
 	def getMangaChapterFileName(self, mangaCode, chapterNumber, destination, formatType="pdf"):
-		print os.sep
 		try:
 			la = self.getMangaInfo(mangaCode)
 		except:
@@ -95,9 +94,9 @@ class MangaEden (Mirror):
 
 				
 		if formatType == "pdf":
-			return destination+os.sep+la[1]+os.sep+la[1]+"_"+str(chapterNumber)+".pdf"
+			return destination+os.path.sep+la[1]+os.path.sep+la[1]+"_"+str(chapterNumber)+".pdf"
 		elif formatType == "image":
-			return destination+os.sep+la[1]+os.sep+str(chapterNumber)+os.sep
+			return destination+os.path.sep+la[1]+os.path.sep+str(chapterNumber)+os.path.sep
 		
 		return None
 		
@@ -114,7 +113,7 @@ class MangaEden (Mirror):
 
 		if formatType == "pdf":
 			try:
-				os.makedirs(destination+os.sep+la[1])
+				os.makedirs(destination+os.path.sep+la[1])
 			except:
 				pass
 			
