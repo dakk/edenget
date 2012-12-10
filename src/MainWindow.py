@@ -33,7 +33,7 @@ import QueueWindow
 import PreferencesWindow
 from Locale import Locale
 
-#gtk.gdk.threads_init()
+gtk.gdk.threads_init()
 
 
 
@@ -516,5 +516,7 @@ class MainWindow:
 		self.mangaEden = MangaEden(username, password)
 		
 	def run(self):
+		gtk.gdk.threads_enter()
 		gtk.main()
+		gtk.gdk.threads_leave()
 		
