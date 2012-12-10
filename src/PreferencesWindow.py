@@ -25,14 +25,14 @@ import os
 import sys
 import gettext
 from SecondaryWindow import *
-from Locale import Locale
+from LLocale import LLocale
 
 
 class PreferencesWindow (SecondaryWindow):
 	folderUri = None
 	
 	def __init__(self, mainWindow):
-		_ = Locale._
+		_ = LLocale._
 		self.mainWindow = mainWindow
 		
 		SecondaryWindow.__init__(self, _("Edenget - Preferences"))
@@ -125,7 +125,7 @@ class PreferencesWindow (SecondaryWindow):
 		
 		
 	def onChooseDestination(self, window, data=None):
-		_ = Locale._
+		_ = LLocale._
 		d = gtk.FileChooserDialog(	title = _("Select a directory to save downloaded data"), 
 									action = gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
 									buttons = ((_("Select"), 1)))

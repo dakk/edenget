@@ -25,7 +25,7 @@ import locale
 import os
 import sys
 import gettext
-from Locale import Locale
+from LLocale import LLocale
 from SecondaryWindow import *
 
 
@@ -40,7 +40,7 @@ class QueueWindow (SecondaryWindow):
 	mainWindow = None
 	
 	def __init__(self, mainw):
-		_ = Locale()._
+		_ = LLocale()._
 		self.mainWindow = mainw
 		
 		SecondaryWindow.__init__(self, _("Edenget - Download Queue"))
@@ -160,7 +160,7 @@ class QueueWindow (SecondaryWindow):
 			self.fileName = mangaEden.getMangaChapterFileName(mangaCode, chapterNumber, destination, formatType)
 			
 		def run(self):
-			_ = Locale()._
+			_ = LLocale()._
 			fname = None
 			try:
 				fname = self.mangaEden.getMangaChapter(self.mangaCode, self.chapterNumber, self.destination, self.formatType, self.stopEvent, self.progressFunc)
@@ -186,7 +186,7 @@ class QueueWindow (SecondaryWindow):
 
 	
 	def runNext(self):
-		_ = Locale()._
+		_ = LLocale()._
 		self.activeTaskLock.acquire()
 		self.activeTask = self.getNextTask()
 			
@@ -207,7 +207,7 @@ class QueueWindow (SecondaryWindow):
 			self.tasksListLock.release()
 	
 	def add(self, mangaEden, mangaCode, chapterNumber, destination, formatType="pdf"):
-		_ = Locale()._
+		_ = LLocale()._
 		t = self.DownloadThread(self.n, mangaEden, mangaCode, chapterNumber, destination, formatType, self)
 					
 		self.n+=1				

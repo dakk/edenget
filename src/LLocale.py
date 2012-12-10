@@ -23,7 +23,7 @@ import gettext
 APP_NAME = "edenget"
 
 
-class Locale:
+class LLocale:
 	_instance = None
 	def __new__(cls, *args, **kwargs):
 		if not cls._instance:
@@ -35,10 +35,10 @@ class Locale:
 
 	langs = []
 		
-	lc, encoding = locale.getdefaultlocale()
-	if (lc):
-		langs = [lc]
-
+	#lc, encoding = locale.getdefaultlocale()
+	#if (lc):
+	#	langs = [lc]
+	
 	language = os.environ.get('LANGUAGE', None)
 	if (language):
 		langs += language.split(":")

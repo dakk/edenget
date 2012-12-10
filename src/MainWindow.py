@@ -31,7 +31,7 @@ from MangaEden import MangaEden
 from Bookmarks import Bookmarks
 import QueueWindow
 import PreferencesWindow
-from Locale import Locale
+from LLocale import LLocale
 
 gtk.gdk.threads_init()
 
@@ -70,7 +70,7 @@ class MainWindow:
 	lang = 1
 	
 	def __init__(self):	
-		_ = Locale()._
+		_ = LLocale()._
 		self.queueWindow = QueueWindow.QueueWindow(self)
 		self.preferencesWindow = PreferencesWindow.PreferencesWindow(self)
 		self.preferencesWindow.loadPrefs()
@@ -322,7 +322,7 @@ class MainWindow:
 		
 
 	def onBookmark(self, isSave):
-		_ = Locale()._
+		_ = LLocale()._
 		if isSave:
 			self.bookmarks.add(self.selectedManga)
 			self.statusBar.push(0, _("Bookmark saved."))
@@ -362,7 +362,7 @@ class MainWindow:
 		return False
 
 	def onAbout(self, window):
-		_ = Locale()._
+		_ = LLocale()._
 		d = gtk.AboutDialog()
 		d.set_authors(["Davide Gessa (gessadavide@gmail.com)"])
 		d.set_license(license)
@@ -408,7 +408,7 @@ class MainWindow:
 
 	def onDownload(self, window):		
 		if self.selectedChapters == None:
-			_ = Locale()._
+			_ = LLocale()._
 			md = gtk.MessageDialog(self.window, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _("You should select at least one chapter."))
 			md.set_title(_("No chapter selected"))
 			md.run()
@@ -427,7 +427,7 @@ class MainWindow:
 			
 	def onDownloadAll(self, window):
 		if self.mangaInfo == None:
-			_ = Locale()._
+			_ = LLocale()._
 			md = gtk.MessageDialog(self.window, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _("You should select a manga."))
 			md.set_title(_("No manga selected"))
 			md.run()
@@ -500,7 +500,7 @@ class MainWindow:
 			
 	
 	def networkError(self):
-		_ = Locale()._
+		_ = LLocale()._
 		md = gtk.MessageDialog(self.window, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, _("Cannot connect to the server."))
 		md.set_title(_("Network Error"))
 		md.run()

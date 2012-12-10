@@ -42,6 +42,7 @@ if os.name == "nt":
 		"py2exe": {
 			"packages": ["encodings", "gtk", "gettext"],
 			"includes": includes,
+			"excludes": [],
 			"optimize": "2",
 			"dist_dir": "dist",
 			"skip_archive": 1
@@ -49,16 +50,16 @@ if os.name == "nt":
 	}		
 	
 	_data_files = []
-	sys.path.insert(0, os.path.abspath("./dlls"))
 	sys.path.insert(0, os.path.abspath("./src"))
 		
 	setup(
 		requires	= ["gtk"],
-		windows	= [{"script": "main.py", "icon_resources": [(1, "edenget.ico")], "dest_base": "edenget"}],
+		windows	= [{"script": "src/main.py", "dest_base": "edenget"}],
 		options	= opts,
 		data_files = _data_files,
 		**setup_info
 	)
+	
 	print "done! files at: dist"
 
 else:
