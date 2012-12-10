@@ -87,6 +87,7 @@ class MangaEden (Mirror):
 
 	""" Get the file path of a chapter """
 	def getMangaChapterFileName(self, mangaCode, chapterNumber, destination, formatType="pdf"):
+		print os.sep
 		try:
 			la = self.getMangaInfo(mangaCode)
 		except:
