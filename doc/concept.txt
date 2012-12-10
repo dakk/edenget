@@ -1,0 +1,11 @@
+Inputs:
+    - Lingua
+    - Manga
+    - Capitolo
+    
+    Ce li cravo tutti nella stessa finestra a cazzo
+    
+    
+    alto: dove salvare i file
+    sinistra: selezione del mirror, selezione lingua, lista dei manga
+    centro: img del manga e lista dei capitoli.
