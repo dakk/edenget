@@ -20,11 +20,17 @@ import urllib2 as ul2
 import json as js
 import os
 import time
+import sys
 import httplib as hl
 import cookielib
 from Mirror import Mirror
 
 
+if sys.platform.find("win" != -1):
+	sep = "\\"
+else:
+	sep = "/"
+	
 class MangaEden (Mirror):		
 	LANGUAGES = [["0", "English", "en"], ["1", "Italiano", "it"]] 
 	IMG_BASE_PATH = "http://cdn.mangaeden.com/mangasimg/"
@@ -94,9 +100,9 @@ class MangaEden (Mirror):
 
 				
 		if formatType == "pdf":
-			return destination+os.path.sep+la[1]+os.path.sep+la[1]+"_"+str(chapterNumber)+".pdf"
+			return destination+sep+la[1]+sep+la[1]+"_"+str(chapterNumber)+".pdf"
 		elif formatType == "image":
-			return destination+os.path.sep+la[1]+os.path.sep+str(chapterNumber)+os.path.sep
+			return destination+sep+la[1]+sep+str(chapterNumber)+sep
 		
 		return None
 		
@@ -113,7 +119,7 @@ class MangaEden (Mirror):
 
 		if formatType == "pdf":
 			try:
-				os.makedirs(destination+os.path.sep+la[1])
+				os.makedirs(destination+sep+la[1])
 			except:
 				pass
 			

@@ -22,6 +22,7 @@ import gettext
 
 APP_NAME = "edenget"
 
+
 class Locale:
 	_instance = None
 	def __new__(cls, *args, **kwargs):
