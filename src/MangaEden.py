@@ -26,10 +26,6 @@ import cookielib
 from Mirror import Mirror
 
 
-if sys.platform.find("win") != -1:
-	sep = "\\"
-else:
-	sep = "/"
 	
 class MangaEden (Mirror):		
 	LANGUAGES = [["0", "English", "en"], ["1", "Italiano", "it"]] 
@@ -100,9 +96,9 @@ class MangaEden (Mirror):
 
 				
 		if formatType == "pdf":
-			return destination+sep+la[1]+sep+la[1]+"_"+str(chapterNumber)+".pdf"
+			return destination+"/"+la[1]+"/"+la[1]+"_"+str(chapterNumber)+".pdf"
 		elif formatType == "image":
-			return destination+sep+la[1]+sep+str(chapterNumber)+sep
+			return destination+"/"+la[1]+"/"+str(chapterNumber)+"/"
 		
 		return None
 		
@@ -119,7 +115,7 @@ class MangaEden (Mirror):
 
 		if formatType == "pdf":
 			try:
-				os.makedirs(destination+sep+la[1])
+				os.makedirs(destination+"/"+la[1])
 			except:
 				pass
 			

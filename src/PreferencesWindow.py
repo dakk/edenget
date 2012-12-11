@@ -132,7 +132,7 @@ class PreferencesWindow (SecondaryWindow):
 		if d.run() == 1:
 			try:
 				self.folderUri = d.get_uri().replace("file://", "")
-				if sys.platform.find("win") != -1 and (self.folderUri[0] == "\\" or self.folderUri[0] == "\\"):
+				if sys.platform.find("win") != -1 and (self.folderUri[0] == "/"):
 					self.folderUri = self.folderUri[1:]
 				d.destroy()
 			except:
