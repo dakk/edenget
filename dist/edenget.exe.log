@@ -2,3 +2,13 @@ C:\Documents and Settings\dagi\Documenti\Repos\edenget\dist\.\MainWindow.py:295:
 
 C:\Documents and Settings\dagi\Documenti\Repos\edenget\dist\.\MainWindow.py:295: GtkWarning: Invalid icon size 16
 
+C:\Documents and Settings\dagi\Documenti\Repos\edenget\dist\.\MainWindow.py:295: GtkWarning: Invalid icon size 16
+
+C:\Documents and Settings\dagi\Documenti\Repos\edenget\dist\.\MainWindow.py:295: GtkWarning: Invalid icon size 16
+
+C:\Documents and Settings\dagi\Documenti\Repos\edenget\dist\.\MainWindow.py:523: GtkWarning: Invalid icon size 16
+
+C:\Documents and Settings\dagi\Documenti\Repos\edenget\dist\.\PreferencesWindow.py:132: GtkWarning: Could not find the icon 'gtk-file'. The 'hicolor' theme
+was not found either, perhaps you need to install it.
+You can get a copy from:
+	http://icon-theme.freedesktop.org/releases
