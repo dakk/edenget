@@ -296,7 +296,7 @@ class MainWindow:
 		
 		
 		self.mangaEden = MangaEden("", "")
-		self.onLanguageComboChanged(self.window)
+		th.Thread(target=self.onLanguageComboChanged, args=(self.window)).start()
 		
 		
 		self.addBookmarkPopup = gtk.Menu()
@@ -319,7 +319,7 @@ class MainWindow:
 		
 		
 		notebook.connect('switch-page', lambda w, p, p1: self.chapterList.clear())
-		self.onBookmarkPopulate()
+		th.Thread(target=self.onBookmarkPopulate, args=()).start()
 		
 
 	def onBookmark(self, isSave):
