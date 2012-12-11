@@ -67,6 +67,7 @@ class MainWindow:
 	queueWindow = None
 	preferencesWindow = None
 	bookmarks = Bookmarks()
+	selectedMangaLock = th.Lock()
 	lang = 1
 	
 	def __init__(self):	
@@ -144,7 +145,7 @@ class MainWindow:
 		self.languageCombo.insert_text(1, "Italiano")
 		self.languageCombo.insert_text(0, "English")
 		self.languageCombo.set_active(1)
-		self.languageCombo.connect('changed', self.onLanguageComboChanged)
+		self.languageCombo.connect('changed', lambda w: th.Thread(target=self.onLanguageComboChanged, args=(w)).start())
 		toolbar.append_element(gtk.TOOLBAR_CHILD_WIDGET, self.languageCombo, None, None, None, None, None, None)
 		
 		
@@ -188,7 +189,7 @@ class MainWindow:
 		
 		self.searchList = gtk.ListStore(str, str)
 		self.searchListView = gtk.TreeView(self.searchList)
-		self.searchListView.connect('cursor-changed', self.onSelectedManga, self.searchListView)
+		self.searchListView.connect('cursor-changed', lambda w,l: th.Thread(target=self.onSelectedManga, args=(w,l)).start(), self.searchListView)
 		self.searchListView.connect('button_press_event', self.onMangaListContextMenu)
 
 		rendererText = gtk.CellRendererText()
@@ -208,7 +209,7 @@ class MainWindow:
 		
 		self.marksList = gtk.ListStore(str, str)
 		self.marksListView = gtk.TreeView(self.marksList)
-		self.marksListView.connect('cursor-changed', self.onSelectedManga, self.marksListView)
+		self.marksListView.connect('cursor-changed', lambda w,l: th.Thread(target=self.onSelectedManga, args=(w,l)).start(), self.marksListView)
 		self.marksListView.connect('button_press_event', self.onMangaListContextMenu)
 
 		rendererText = gtk.CellRendererText()
@@ -228,7 +229,7 @@ class MainWindow:
 		
 		self.mangaList = gtk.ListStore(str, str)
 		self.mangaListView = gtk.TreeView(self.mangaList)
-		self.mangaListView.connect('cursor-changed', self.onSelectedManga, self.mangaListView)
+		self.mangaListView.connect('cursor-changed', lambda w,l: th.Thread(target=self.onSelectedManga, args=(w,l)).start(), self.mangaListView)
 		self.mangaListView.connect('button_press_event', self.onMangaListContextMenu)
 
 		rendererText = gtk.CellRendererText()
@@ -258,7 +259,7 @@ class MainWindow:
 		#self.chapterListView.connect('cursor-changed', self.onSelectedChapter)
 		selection = self.chapterListView.get_selection()
 		selection.set_mode(gtk.SELECTION_MULTIPLE)
-		selection.connect("changed", self.onSelectedChapter)
+		selection.connect("changed", lambda w, d=None: th.Thread(target=self.onSelectedChapter, args=(w,d)).start())
         
 
 		rendererText = gtk.CellRendererText()
@@ -458,6 +459,7 @@ class MainWindow:
 		if data == None:
 			return
 		
+		self.selectedMangaLock.acquire()
 		selection = data.get_selection()
 		selection.set_mode(gtk.SELECTION_SINGLE)
 		tree_model, tree_iter = selection.get_selected()
@@ -473,6 +475,7 @@ class MainWindow:
 			self.mangaInfo = self.mangaEden.getMangaInfo(self.selectedManga[1])
 		except:
 			self.mangaInfo = ""
+			self.selectedMangaLock.release()
 			self.networkError()
 			return
 				
@@ -494,9 +497,9 @@ class MainWindow:
 			
 			except:
 				self.mangaImage.clear()
-				return
 		else:
 			self.mangaImage.clear()
+		self.selectedMangaLock.release()
 			
 	
 	def networkError(self):
