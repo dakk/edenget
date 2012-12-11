@@ -131,7 +131,7 @@ class PreferencesWindow (SecondaryWindow):
 									buttons = ((_("Select"), 1)))
 		if d.run() == 1:
 			try:
-				self.folderUri = d.get_uri().replace("file://", "")
+				self.folderUri = d.get_uri().replace("file://", "").replace("%20", " ")
 				if sys.platform.find("win") != -1 and (self.folderUri[0] == "/"):
 					self.folderUri = self.folderUri[1:]
 				d.destroy()
