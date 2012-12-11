@@ -26,7 +26,7 @@ import cookielib
 from Mirror import Mirror
 
 
-if sys.platform.find("win" != -1):
+if sys.platform.find("win") != -1:
 	sep = "\\"
 else:
 	sep = "/"
